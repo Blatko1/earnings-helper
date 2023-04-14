@@ -7,6 +7,8 @@ const BENZINGA: &str = "https://www.benzinga.com/calendars/earnings";
 const INVESTING: &str = "https://www.investing.com/earnings-calendar/";
 const CNBC: &str = "https://www.cnbc.com/earnings-calendar/";
 const EARNINGS_WHISPERS: &str = "https://www.earningswhispers.com/calendar";
+const TRADING_VIEW: &str =
+    "https://www.tradingview.com/markets/stocks-usa/earnings/";
 
 pub struct Company {
     pub symbol: String,

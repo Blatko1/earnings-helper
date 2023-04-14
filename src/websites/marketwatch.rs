@@ -1,11 +1,18 @@
-use chrono::{DateTime, Local};
+use chrono::NaiveDate;
+
+use crate::RelativeDay;
 
 use super::Company;
 use super::MARKETWATCH;
 
-pub fn get_marketwatch_data(date: DateTime<Local>) -> anyhow::Result<Vec<Company>> {
-    let req = reqwest::blocking::get(MARKETWATCH)?;
-    let document = scraper::Html::parse_document(&req.text()?);
+pub async fn get_marketwatch_data_relative_day(
+    day: RelativeDay,
+) -> anyhow::Result<Vec<Company>> {
+    get_data_for_date(day.get_date()).await
+}
+
+async fn get_data_for_date(date: NaiveDate) -> anyhow::Result<Vec<Company>> {
+    /*let document = scraper::Html::parse_document(&req.text().await?);
     let date_selector = &format!(
         "div.element[data-tab-pane=\"{}\"]>",
         date.format("%m/%d/%Y")
@@ -21,6 +28,8 @@ pub fn get_marketwatch_data(date: DateTime<Local>) -> anyhow::Result<Vec<Company
         scraper::Selector::parse(css_company_name_selector)
             .map_err(|e| eprintln!("{e}"))
             .unwrap();
+
+    
 
     let symbols: Vec<String> = document
         .select(&symbol_selector)
@@ -40,7 +49,7 @@ pub fn get_marketwatch_data(date: DateTime<Local>) -> anyhow::Result<Vec<Company
         })
         .collect();
 
-    Ok(companies)
+    Ok(companies)*/
 }
 
 // Children of the parent div with date.
