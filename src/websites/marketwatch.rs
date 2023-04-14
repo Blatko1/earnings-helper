@@ -1,18 +1,19 @@
-use chrono::NaiveDate;
+use chrono::{DateTime, Local};
 
+use super::Company;
 use super::MARKETWATCH;
 
-pub fn get_marketwatch_data(date: NaiveDate) -> anyhow::Result<()> {
+pub fn get_marketwatch_data(date: DateTime<Local>) -> anyhow::Result<Vec<Company>> {
     let req = reqwest::blocking::get(MARKETWATCH)?;
     let document = scraper::Html::parse_document(&req.text()?);
-    let main_parent = &format!(
+    let date_selector = &format!(
         "div.element[data-tab-pane=\"{}\"]>",
         date.format("%m/%d/%Y")
     );
 
-    let css_symbol_selector = &format!("{}{}", main_parent, SYMBOL_SELECTOR);
+    let css_symbol_selector = &format!("{}{}", date_selector, SYMBOL_SELECTOR);
     let css_company_name_selector =
-        &format!("{}{}", main_parent, COMPANY_NAME_SELECTOR);
+        &format!("{}{}", date_selector, COMPANY_NAME_SELECTOR);
     let symbol_selector = scraper::Selector::parse(css_symbol_selector)
         .map_err(|e| eprintln!("{e}"))
         .unwrap();
@@ -30,9 +31,16 @@ pub fn get_marketwatch_data(date: NaiveDate) -> anyhow::Result<()> {
         .map(|e| e.inner_html())
         .collect();
     assert_eq!(symbols.len(), company_names.len());
-    println!("{symbols:?} \n {company_names:?}");
+    let companies: Vec<Company> = symbols
+        .iter()
+        .zip(company_names.iter())
+        .map(|(symbol, name)| Company {
+            symbol: symbol.clone(),
+            name: name.clone(),
+        })
+        .collect();
 
-    Ok(())
+    Ok(companies)
 }
 
 // Children of the parent div with date.

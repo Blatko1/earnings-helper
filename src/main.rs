@@ -1,10 +1,10 @@
-use chrono::NaiveDate;
+use websites::{marketwatch, zacks};
 
 mod websites;
 
-fn main() {
-    websites::marketwatch::get_marketwatch_data(
-        NaiveDate::from_ymd_opt(2023, 4, 14).unwrap(),
-    ).unwrap();
-    websites::zacks::get_zacks_data().unwrap();
+#[tokio::main]
+async fn main() {
+    let today = chrono::offset::Local::now();
+    let companies = marketwatch::get_marketwatch_data(today).unwrap();
+    zacks::get_zacks_data(today).unwrap();
 }
