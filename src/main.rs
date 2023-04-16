@@ -1,20 +1,24 @@
 use chrono::{Days, NaiveDate};
 use thirtyfour::{DesiredCapabilities, WebDriver};
-use websites::{marketwatch, zacks};
+use websites::marketwatch;
 
 mod websites;
 
 #[tokio::main]
 async fn main() {
-    let day = RelativeDay::Today;
     let mut caps = DesiredCapabilities::chrome();
-    caps.set_headless().unwrap();
+    //caps.set_headless().unwrap();
+
     let driver = WebDriver::new("http://localhost:9515", caps).await.unwrap();
+    let day = RelativeDay::Tomorrow;
+    let companies = marketwatch::get_marketwatch_data(&driver, day)
+        .await
+        .unwrap();
+    println!("comanies: {companies:?}");
 
-    let companies =
-        marketwatch::get_marketwatch_data_relative_day(client, day).await.unwrap();
+    //zacks::get_zacks_data(day).await.unwrap();
 
-    zacks::get_zacks_data(day).await.unwrap();
+    driver.quit().await.unwrap();
 }
 
 #[derive(Debug, Clone, Copy)]

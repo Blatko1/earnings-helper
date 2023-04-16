@@ -10,6 +10,7 @@ const EARNINGS_WHISPERS: &str = "https://www.earningswhispers.com/calendar";
 const TRADING_VIEW: &str =
     "https://www.tradingview.com/markets/stocks-usa/earnings/";
 
+#[derive(Debug, Clone, Default)]
 pub struct Company {
     pub symbol: String,
     pub name: String,
