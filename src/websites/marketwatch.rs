@@ -1,29 +1,26 @@
+use chrono::{Datelike, NaiveDate, Weekday};
 use std::time::Duration;
-
-use chrono::Datelike;
-use chrono::NaiveDate;
-use chrono::Weekday;
-use thirtyfour::prelude::ElementQueryable;
-use thirtyfour::By;
-use thirtyfour::WebDriver;
+use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
 use crate::RelativeDay;
 
-use super::Company;
-use super::MARKETWATCH;
+use super::{Company, MARKETWATCH};
 
 pub async fn get_marketwatch_data(
     driver: &WebDriver,
     day: RelativeDay,
 ) -> anyhow::Result<Vec<Company>> {
     driver.goto(MARKETWATCH).await?;
-    // If cookies window was not found then make sure to return 
+    // If cookies window was not found then make sure to return
     // back to the default frame.
-    accept_cookies(driver).await.or(driver.enter_default_frame().await)?;
+    accept_cookies(driver)
+        .await
+        .or(driver.enter_default_frame().await)?;
 
     let today = chrono::offset::Local::now().date_naive();
     let target = day.get_date();
     let target_weekday = target.weekday();
+    // Weekdays here are counted from Mon to Sun.
     match today.weekday() {
         // Check if the target week is before the today week
         Weekday::Mon => {
@@ -31,7 +28,7 @@ pub async fn get_marketwatch_data(
                 to_previous_week(driver).await?;
             }
         }
-        // Check if the target week is before the today week
+        // Check if the target week is after the today week
         Weekday::Sun => {
             if target_weekday == Weekday::Mon {
                 to_next_week(driver).await?;
@@ -39,7 +36,7 @@ pub async fn get_marketwatch_data(
         }
         _ => (),
     }
-    get_data_for_date(driver, target).await
+    get_data(driver, target).await
 }
 
 async fn to_previous_week(driver: &WebDriver) -> anyhow::Result<()> {
@@ -51,7 +48,7 @@ async fn to_previous_week(driver: &WebDriver) -> anyhow::Result<()> {
         .await
         .is_err()
     {
-        // If it was not available, click the previous day button.
+        // If it was not available, click the previous week button.
         driver
             .find(By::Css(PREVIOUS_WEEK_SELECTOR))
             .await?
@@ -70,7 +67,7 @@ async fn to_next_week(driver: &WebDriver) -> anyhow::Result<()> {
         .await
         .is_err()
     {
-        // If it was not available, click the next day button.
+        // If it was not available, click the next week button.
         driver
             .find(By::Css(NEXT_WEEK_SELECTOR))
             .await?
@@ -100,7 +97,7 @@ async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn get_data_for_date(
+async fn get_data(
     driver: &WebDriver,
     date: NaiveDate,
 ) -> anyhow::Result<Vec<Company>> {
@@ -108,7 +105,7 @@ async fn get_data_for_date(
         &format!("div.element[data-tab-pane=\"{}\"]", date.format("%m/%d/%Y"));
     driver
         .query(By::Css(date_selector))
-        .wait(Duration::from_secs(20), Duration::from_secs(1))
+        .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
         .desc("Find the current date data")
         .single()
         .await?;
@@ -157,8 +154,7 @@ const NEXT_WEEK_SELECTOR: &str = "li[class=\"tab__item next week\"]";
 const PREVIOUS_DAY_SELECTOR: &str = "li[class=\"tab__item prev day\"]";
 const NEXT_DAY_SELECTOR: &str = "li[class=\"tab__item next day\"]";
 const COOKIES_AGREE_BUTTON_SELECTOR: &str = "button[class=\"message-component message-button no-children focusable agree-btn sp_choice_type_11\"]";
-const COOKIE_MESSAGE_CONTAINER: &str = "sp_message_container_719544";
 const COOKIE_MESSAGE_IFRAME: &str = "sp_message_iframe_719544";
-const BODY_SELECTOR: &str = "body[class=\"page--tools   \"]";
 const WAIT_INTERVAL: Duration = Duration::from_secs(1);
-const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(1);
+const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
+const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
