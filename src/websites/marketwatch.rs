@@ -15,7 +15,9 @@ pub async fn get_marketwatch_data(
     day: RelativeDay,
 ) -> anyhow::Result<Vec<Company>> {
     driver.goto(MARKETWATCH).await?;
-    accept_cookies(driver).await?;
+    // If cookies window was not found then make sure to return 
+    // back to the default frame.
+    //accept_cookies(driver).await.or(driver.enter_default_frame().await)?;
 
     let today = chrono::offset::Local::now().date_naive();
     let target = day.get_date();
@@ -27,7 +29,7 @@ pub async fn get_marketwatch_data(
                 to_previous_week(driver).await?;
             }
         }
-        // Check if the target week is before the today week
+        // Check if the target week is after the today week
         Weekday::Sun => {
             if target_weekday == Weekday::Mon {
                 to_next_week(driver).await?;
@@ -35,6 +37,7 @@ pub async fn get_marketwatch_data(
         }
         _ => (),
     }
+    driver.find(By::Css(NEXT_DAY_SELECTOR)).await?.click().await?;
     get_data_for_date(driver, target).await
 }
 
@@ -99,6 +102,7 @@ async fn get_data_for_date(
         "div.element[data-tab-pane=\"{}\"]>",
         date.format("%m/%d/%Y")
     );
+    std::fs::write("site", source)?;
 
     let css_symbol_selector = &format!("{}{}", date_selector, SYMBOL_SELECTOR);
     let css_company_name_selector =

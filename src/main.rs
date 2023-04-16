@@ -6,19 +6,40 @@ mod websites;
 
 #[tokio::main]
 async fn main() {
+    print!("Initializing WebDriver...");
     let mut caps = DesiredCapabilities::chrome();
     //caps.set_headless().unwrap();
-
-    let driver = WebDriver::new("http://localhost:9515", caps).await.unwrap();
-    let day = RelativeDay::Tomorrow;
-    let companies = marketwatch::get_marketwatch_data(&driver, day)
+    let driver = WebDriver::new("http://localhost:9515", caps)
         .await
+        .map_err(|e| println!("Is chromedriver started? Error: {e}"))
         .unwrap();
-    println!("comanies: {companies:?}");
+    println!(" Success!");
 
+    let day = RelativeDay::Tomorrow;
+
+    print!("Reading MarketWatch data...");
+    let mut max_reruns = 1;
+    let companies = loop {
+        match marketwatch::get_marketwatch_data(&driver, day).await {
+            Ok(c) => {
+                println!("Success!");
+                break c;
+            }
+            Err(e) => {
+                if max_reruns == 0 {
+                    println!("\nCouldn't parse data: {e}");
+                    break vec![websites::Company::default()];
+                }
+                print!("Failed to parse data! Trying again...");
+                max_reruns -= 1;
+                continue;
+            }
+        }
+    };
+    println!("data: {companies:?}");
     //zacks::get_zacks_data(day).await.unwrap();
 
-    driver.quit().await.unwrap();
+    //driver.quit().await.unwrap();
 }
 
 #[derive(Debug, Clone, Copy)]
