@@ -8,12 +8,12 @@ mod websites;
 async fn main() {
     print!("Initializing WebDriver...");
     let mut caps = DesiredCapabilities::chrome();
-    //caps.set_headless().unwrap();
+    caps.set_headless().unwrap();
     let driver = WebDriver::new("http://localhost:9515", caps)
         .await
         .map_err(|e| println!("Is chromedriver started? Error: {e}"))
         .unwrap();
-    println!(" Success!");
+    println!("Success!");
 
     let day = RelativeDay::Tomorrow;
 
@@ -28,7 +28,7 @@ async fn main() {
             Err(e) => {
                 if max_reruns == 0 {
                     println!("\nCouldn't parse data: {e}");
-                    break vec![websites::Company::default()];
+                    break vec![];
                 }
                 print!("Failed to parse data! Trying again...");
                 max_reruns -= 1;
@@ -36,10 +36,9 @@ async fn main() {
             }
         }
     };
-    println!("data: {companies:?}");
     //zacks::get_zacks_data(day).await.unwrap();
 
-    //driver.quit().await.unwrap();
+    driver.quit().await.unwrap();
 }
 
 #[derive(Debug, Clone, Copy)]

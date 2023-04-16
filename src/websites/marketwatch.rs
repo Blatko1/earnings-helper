@@ -1,7 +1,9 @@
+use std::time::Duration;
+
 use chrono::Datelike;
 use chrono::NaiveDate;
 use chrono::Weekday;
-use thirtyfour::prelude::ElementWaitable;
+use thirtyfour::prelude::ElementQueryable;
 use thirtyfour::By;
 use thirtyfour::WebDriver;
 
@@ -17,7 +19,7 @@ pub async fn get_marketwatch_data(
     driver.goto(MARKETWATCH).await?;
     // If cookies window was not found then make sure to return 
     // back to the default frame.
-    //accept_cookies(driver).await.or(driver.enter_default_frame().await)?;
+    accept_cookies(driver).await.or(driver.enter_default_frame().await)?;
 
     let today = chrono::offset::Local::now().date_naive();
     let target = day.get_date();
@@ -29,7 +31,7 @@ pub async fn get_marketwatch_data(
                 to_previous_week(driver).await?;
             }
         }
-        // Check if the target week is after the today week
+        // Check if the target week is before the today week
         Weekday::Sun => {
             if target_weekday == Weekday::Mon {
                 to_next_week(driver).await?;
@@ -37,17 +39,17 @@ pub async fn get_marketwatch_data(
         }
         _ => (),
     }
-    driver.find(By::Css(NEXT_DAY_SELECTOR)).await?.click().await?;
     get_data_for_date(driver, target).await
 }
 
 async fn to_previous_week(driver: &WebDriver) -> anyhow::Result<()> {
     // Firstly, click the previous day button if available
-    if let Err(_) = driver
+    if driver
         .find(By::Css(PREVIOUS_DAY_SELECTOR))
         .await?
         .click()
         .await
+        .is_err()
     {
         // If it was not available, click the previous day button.
         driver
@@ -61,7 +63,12 @@ async fn to_previous_week(driver: &WebDriver) -> anyhow::Result<()> {
 
 async fn to_next_week(driver: &WebDriver) -> anyhow::Result<()> {
     // Firstly, click the next day button if available
-    if let Err(_) = driver.find(By::Css(NEXT_DAY_SELECTOR)).await?.click().await
+    if driver
+        .find(By::Css(NEXT_DAY_SELECTOR))
+        .await?
+        .click()
+        .await
+        .is_err()
     {
         // If it was not available, click the next day button.
         driver
@@ -76,11 +83,12 @@ async fn to_next_week(driver: &WebDriver) -> anyhow::Result<()> {
 /// Waits for and accepts cookies in order to be able to
 /// interact with the elements behind the cookies iframe.
 async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
-    let body = driver.find(By::Css(BODY_SELECTOR)).await?;
-    body.wait_until().displayed().await?;
-    let cookies_iframe = driver.find(By::Id(COOKIE_MESSAGE_CONTAINER)).await?;
-    cookies_iframe.wait_until().displayed().await?;
-    let iframe = driver.find(By::Id(COOKIE_MESSAGE_IFRAME)).await?;
+    let iframe = driver
+        .query(By::Id(COOKIE_MESSAGE_IFRAME))
+        .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
+        .desc("Wait for cookies dialog box to appear")
+        .single()
+        .await?;
     iframe.enter_frame().await?;
     driver
         .find(By::Css(COOKIES_AGREE_BUTTON_SELECTOR))
@@ -96,17 +104,20 @@ async fn get_data_for_date(
     driver: &WebDriver,
     date: NaiveDate,
 ) -> anyhow::Result<Vec<Company>> {
+    let date_selector =
+        &format!("div.element[data-tab-pane=\"{}\"]", date.format("%m/%d/%Y"));
+    driver
+        .query(By::Css(date_selector))
+        .wait(Duration::from_secs(20), Duration::from_secs(1))
+        .desc("Find the current date data")
+        .single()
+        .await?;
     let source = driver.source().await?;
     let document = scraper::Html::parse_document(&source);
-    let date_selector = &format!(
-        "div.element[data-tab-pane=\"{}\"]>",
-        date.format("%m/%d/%Y")
-    );
-    std::fs::write("site", source)?;
 
-    let css_symbol_selector = &format!("{}{}", date_selector, SYMBOL_SELECTOR);
+    let css_symbol_selector = &format!("{}>{}", date_selector, SYMBOL_SELECTOR);
     let css_company_name_selector =
-        &format!("{}{}", date_selector, COMPANY_NAME_SELECTOR);
+        &format!("{}>{}", date_selector, COMPANY_NAME_SELECTOR);
     let symbol_selector = scraper::Selector::parse(css_symbol_selector)
         .map_err(|e| eprintln!("{e}"))
         .unwrap();
@@ -149,3 +160,5 @@ const COOKIES_AGREE_BUTTON_SELECTOR: &str = "button[class=\"message-component me
 const COOKIE_MESSAGE_CONTAINER: &str = "sp_message_container_719544";
 const COOKIE_MESSAGE_IFRAME: &str = "sp_message_iframe_719544";
 const BODY_SELECTOR: &str = "body[class=\"page--tools   \"]";
+const WAIT_INTERVAL: Duration = Duration::from_secs(1);
+const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(1);
