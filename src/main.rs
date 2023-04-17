@@ -16,7 +16,7 @@ async fn main() {
         .unwrap();
     println!("Success!");
 
-    let day = RelativeDay::Yesterday;
+    let day = RelativeDay::Today;
     //let companies1 = websites::marketwatch_data(&driver, day).await.unwrap();
 
     let companies2 = websites::zacks_data(&driver, day).await.unwrap();

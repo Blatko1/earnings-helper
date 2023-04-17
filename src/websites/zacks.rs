@@ -1,4 +1,4 @@
-use chrono::{Datelike, NaiveDate, Weekday};
+use chrono::{format::DelayedFormat, Datelike, Days, NaiveDate, Weekday};
 use std::{time::Duration, vec};
 use thirtyfour::{
     prelude::{ElementQueryable, WebDriverError},
@@ -81,33 +81,43 @@ async fn get_data(
     date: NaiveDate,
 ) -> anyhow::Result<Vec<Company>> {
     let weekday = date.weekday();
-    let weekday_num = weekday.num_days_from_sunday();
+    let weekday_num = weekday.num_days_from_sunday() as u64;
+    let week_start = date.checked_sub_days(Days::new(weekday_num)).unwrap();
+    let week_end = date.checked_add_days(Days::new(6 - weekday_num)).unwrap();
+    let header_text = format!(
+        "Events For {} - {}",
+        week_start.format("%-m/%-d/%Y"),
+        week_end.format("%-m/%-d/%Y")
+    );
     let header_id = format!("d_{}", weekday_num);
     let earnings_link_id = format!("cal_link_{}", weekday_num);
-    // Retry until the header or the button is clicked 
+    println!("{earnings_link_id}");
+    // Retry until the header or the button is clicked
     // (or maybe there is no button).
-    loop {
-        if let Ok(e) = driver.query(By::Id(&earnings_link_id)).wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL).desc("Wait for the 'earnings' button to load or find out if it doesn't exist").single().await {
+    driver
+        .query(By::Id("WeeklyEventsTitle"))
+        .with_text(header_text)
+        .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
+        .single()
+        .await?;
+    if let Ok(e) = driver.query(By::Id(&earnings_link_id))
+    .with_text("Earnings").wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
+    .desc("Wait for the 'earnings' button to load or find out if it doesn't exist").single().await {
+        loop {
             if e.click().await.is_err() {
-                match driver
-                    .query(By::Id(&header_id))
-                    .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
-                    .desc("Find and click date header to access data")
-                    .single()
-                    .await
-                {
-                    Ok(e) => match e.click().await {
-                        Ok(_) => continue,
-                        Err(WebDriverError::NoSuchElement(_)) => continue,
-                        Err(e) => return Err(e.into()),
-                    },
-                    Err(e) => return Err(e.into()),
-                }
+                driver
+                        .query(By::Id(&header_id))
+                        .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
+                        .desc("Find and click date header to access data")
+                        .single()
+                        .await?.click().await?;
+                continue;
             }
-        } else {
-            return Ok(vec![])
+            break;
         }
-        break;
+    }
+    else {
+        return Ok(vec![ ])
     }
 
     Ok(vec![])
@@ -120,3 +130,84 @@ const NEXT_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_right\"]>a";
 const WAIT_INTERVAL: Duration = Duration::from_secs(1);
 const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
 const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
+
+#[test]
+fn week_range_dates() {
+    let date = NaiveDate::from_ymd_opt(2023, 4, 17).unwrap();
+    let weekday_num = date.weekday().num_days_from_sunday() as u64;
+    let week_start = date.checked_sub_days(Days::new(weekday_num)).unwrap();
+    let week_end = date.checked_add_days(Days::new(6 - weekday_num)).unwrap();
+    assert_eq!(
+        format!(
+            "Events For {} - {}",
+            week_start.format("%-m/%-d/%Y"),
+            week_end.format("%-m/%-d/%Y")
+        ),
+        "Events For 4/16/2023 - 4/22/2023"
+    );
+
+    let date = NaiveDate::from_ymd_opt(2023, 4, 16).unwrap();
+    let weekday_num = date.weekday().num_days_from_sunday() as u64;
+    let week_start = date.checked_sub_days(Days::new(weekday_num)).unwrap();
+    let week_end = date.checked_add_days(Days::new(6 - weekday_num)).unwrap();
+    assert_eq!(
+        format!(
+            "Events For {} - {}",
+            week_start.format("%-m/%-d/%Y"),
+            week_end.format("%-m/%-d/%Y")
+        ),
+        "Events For 4/16/2023 - 4/22/2023"
+    );
+
+    let date = NaiveDate::from_ymd_opt(2023, 4, 15).unwrap();
+    let weekday_num = date.weekday().num_days_from_sunday() as u64;
+    let week_start = date.checked_sub_days(Days::new(weekday_num)).unwrap();
+    let week_end = date.checked_add_days(Days::new(6 - weekday_num)).unwrap();
+    assert_eq!(
+        format!(
+            "Events For {} - {}",
+            week_start.format("%-m/%-d/%Y"),
+            week_end.format("%-m/%-d/%Y")
+        ),
+        "Events For 4/9/2023 - 4/15/2023"
+    );
+
+    let date = NaiveDate::from_ymd_opt(2023, 4, 6).unwrap();
+    let weekday_num = date.weekday().num_days_from_sunday() as u64;
+    let week_start = date.checked_sub_days(Days::new(weekday_num)).unwrap();
+    let week_end = date.checked_add_days(Days::new(6 - weekday_num)).unwrap();
+    assert_eq!(
+        format!(
+            "Events For {} - {}",
+            week_start.format("%-m/%-d/%Y"),
+            week_end.format("%-m/%-d/%Y")
+        ),
+        "Events For 4/2/2023 - 4/8/2023"
+    );
+
+    let date = NaiveDate::from_ymd_opt(2023, 4, 24).unwrap();
+    let weekday_num = date.weekday().num_days_from_sunday() as u64;
+    let week_start = date.checked_sub_days(Days::new(weekday_num)).unwrap();
+    let week_end = date.checked_add_days(Days::new(6 - weekday_num)).unwrap();
+    assert_eq!(
+        format!(
+            "Events For {} - {}",
+            week_start.format("%-m/%-d/%Y"),
+            week_end.format("%-m/%-d/%Y")
+        ),
+        "Events For 4/23/2023 - 4/29/2023"
+    );
+
+    let date = NaiveDate::from_ymd_opt(2023, 4, 30).unwrap();
+    let weekday_num = date.weekday().num_days_from_sunday() as u64;
+    let week_start = date.checked_sub_days(Days::new(weekday_num)).unwrap();
+    let week_end = date.checked_add_days(Days::new(6 - weekday_num)).unwrap();
+    assert_eq!(
+        format!(
+            "Events For {} - {}",
+            week_start.format("%-m/%-d/%Y"),
+            week_end.format("%-m/%-d/%Y")
+        ),
+        "Events For 4/30/2023 - 5/6/2023"
+    );
+}
