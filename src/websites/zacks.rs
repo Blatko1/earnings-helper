@@ -1,13 +1,21 @@
-use chrono::{format::DelayedFormat, Datelike, Days, NaiveDate, Weekday};
+use chrono::{Datelike, Days, NaiveDate, Weekday};
 use std::{time::Duration, vec};
-use thirtyfour::{
-    prelude::{ElementQueryable, WebDriverError},
-    By, WebDriver,
-};
-
-use crate::RelativeDay;
+use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
 use super::{Company, ZACKS};
+use crate::RelativeDay;
+
+const PREVIOUS_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_left\"]>a";
+const NEXT_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_right\"]>a";
+const WAIT_INTERVAL: Duration = Duration::from_secs(1);
+const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
+const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
+const SCROLL_INTO_VIEW: &str =
+    r#"arguments[0].scrollIntoView({behavior: "auto", block: "center"});"#;
+const COOKIE_ACCEPT_ID: &str = "accept_cookie";
+const EVENTS_TITLE: &str = "WeeklyEventsTitle";
+const COPY_BUTTON_SELECTOR: &str =
+    "a[class=\"dt-button buttons-copy buttons-html5\"]";
 
 pub async fn get_zacks_data(
     driver: &WebDriver,
@@ -47,7 +55,9 @@ async fn to_previous_week(driver: &WebDriver) -> anyhow::Result<()> {
         .desc("Find 'Previous Week' button")
         .single()
         .await?;
-    driver.execute(r#"arguments[0].scrollIntoView({behavior: "auto", block: "center"});"#, vec![button.to_json()?]).await?;
+    driver
+        .execute(SCROLL_INTO_VIEW, vec![button.to_json()?])
+        .await?;
     button.click().await?;
     Ok(())
 }
@@ -59,14 +69,16 @@ async fn to_next_week(driver: &WebDriver) -> anyhow::Result<()> {
         .desc("Find 'Next Week' button")
         .single()
         .await?;
-    driver.execute(r#"arguments[0].scrollIntoView({behavior: "auto", block: "center"});"#, vec![button.to_json()?]).await?;
+    driver
+        .execute(SCROLL_INTO_VIEW, vec![button.to_json()?])
+        .await?;
     button.click().await?;
     Ok(())
 }
 
 async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
     driver
-        .query(By::Id("accept_cookie"))
+        .query(By::Id(COOKIE_ACCEPT_ID))
         .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
         .desc("Find the 'Accept cookies' button")
         .single()
@@ -80,6 +92,7 @@ async fn get_data(
     driver: &WebDriver,
     date: NaiveDate,
 ) -> anyhow::Result<Vec<Company>> {
+    // Calculate and create needed header IDs.
     let weekday = date.weekday();
     let weekday_num = weekday.num_days_from_sunday() as u64;
     let week_start = date.checked_sub_days(Days::new(weekday_num)).unwrap();
@@ -91,45 +104,53 @@ async fn get_data(
     );
     let header_id = format!("d_{}", weekday_num);
     let earnings_link_id = format!("cal_link_{}", weekday_num);
-    println!("{earnings_link_id}");
-    // Retry until the header or the button is clicked
-    // (or maybe there is no button).
+    let earnings_selector_css =
+        format!("a#{}[evt_type=\"1\"]", earnings_link_id);
+
     driver
-        .query(By::Id("WeeklyEventsTitle"))
+        .query(By::Id(EVENTS_TITLE))
         .with_text(header_text)
         .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
         .single()
         .await?;
-    if let Ok(e) = driver.query(By::Id(&earnings_link_id))
-    .with_text("Earnings").wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
-    .desc("Wait for the 'earnings' button to load or find out if it doesn't exist").single().await {
+    if let Ok(e) = driver
+        .query(By::Css(&earnings_selector_css))
+        .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
+        .desc("Find the 'earnings' button")
+        .single()
+        .await
+    {
         loop {
             if e.click().await.is_err() {
                 driver
-                        .query(By::Id(&header_id))
-                        .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
-                        .desc("Find and click date header to access data")
-                        .single()
-                        .await?.click().await?;
+                    .query(By::Id(&header_id))
+                    .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
+                    .desc("Click date header to access data")
+                    .single()
+                    .await?
+                    .click()
+                    .await?;
                 continue;
             }
             break;
         }
+    } else {
+        return Ok(vec![]);
     }
-    else {
-        return Ok(vec![ ])
-    }
+    let button = driver
+        .query(By::Css(COPY_BUTTON_SELECTOR))
+        .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
+        .single()
+        .await?;
+    driver
+    .execute(SCROLL_INTO_VIEW, vec![button.to_json()?])
+    .await?;
+    button.click().await?;
+    let mut clipboard = arboard::Clipboard::new()?;
+    let data = clipboard.get_text()?;
 
     Ok(vec![])
 }
-
-const PARENT: &str = "table[id=\"earnings_rel_data_all_table\"]>tbody";
-const SYMBOL_SELECTOR: &str = "";
-const PREVIOUS_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_left\"]>a";
-const NEXT_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_right\"]>a";
-const WAIT_INTERVAL: Duration = Duration::from_secs(1);
-const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
-const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
 
 #[test]
 fn week_range_dates() {

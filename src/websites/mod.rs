@@ -1,3 +1,5 @@
+use std::io::{self, Write};
+
 use chrono::{Days, NaiveDate};
 use thirtyfour::WebDriver;
 
@@ -26,6 +28,7 @@ pub async fn marketwatch_data(
     print!("Reading 'MarketWatch' data...");
     let mut max_reruns = 1;
     loop {
+        std::io::stdout().flush()?;
         match marketwatch::get_marketwatch_data(driver, day).await {
             Ok(c) => {
                 println!("Success!");
@@ -49,8 +52,10 @@ pub async fn zacks_data(
     day: RelativeDay,
 ) -> anyhow::Result<Vec<Company>> {
     print!("Reading 'Zacks' data...");
+    std::io::stdout().flush()?;
     let data = zacks::get_zacks_data(driver, day).await.unwrap();
     println!("Success!");
+    std::io::stdout().flush()?;
     Ok(data)
 }
 
