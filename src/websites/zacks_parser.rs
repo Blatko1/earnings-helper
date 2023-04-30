@@ -17,7 +17,7 @@ const EVENTS_TITLE: &str = "WeeklyEventsTitle";
 const COPY_BUTTON_SELECTOR: &str =
     "a[class=\"dt-button buttons-copy buttons-html5\"]";
 
-pub async fn get_zacks_data(
+pub async fn get_data(
     driver: &WebDriver,
     day: RelativeDay,
 ) -> anyhow::Result<Vec<Company>> {
@@ -45,7 +45,7 @@ pub async fn get_zacks_data(
         _ => (),
     }
 
-    get_data(driver, target).await
+    parse_data(driver, target).await
 }
 
 async fn to_previous_week(driver: &WebDriver) -> anyhow::Result<()> {
@@ -88,7 +88,7 @@ async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn get_data(
+async fn parse_data(
     driver: &WebDriver,
     date: NaiveDate,
 ) -> anyhow::Result<Vec<Company>> {
@@ -143,13 +143,28 @@ async fn get_data(
         .single()
         .await?;
     driver
-    .execute(SCROLL_INTO_VIEW, vec![button.to_json()?])
-    .await?;
+        .execute(SCROLL_INTO_VIEW, vec![button.to_json()?])
+        .await?;
     button.click().await?;
     let mut clipboard = arboard::Clipboard::new()?;
     let data = clipboard.get_text()?;
+    let companies = parse_data_table(data);
 
-    Ok(vec![])
+    Ok(companies)
+}
+
+fn parse_data_table(data: String) -> Vec<Company> {
+    let mut lines: Vec<&str> = data.split('\n').collect();
+    lines.remove(0);
+    let mut result = Vec::with_capacity(lines.len());
+    for l in lines {
+        let fields: Vec<&str> = l.trim().split('\t').collect();
+        result.push(Company {
+            symbol: fields[0].to_string(),
+            name: fields[1].to_string(),
+        });
+    }
+    result
 }
 
 #[test]

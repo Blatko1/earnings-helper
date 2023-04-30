@@ -2,11 +2,24 @@ use chrono::{Datelike, NaiveDate, Weekday};
 use std::time::Duration;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
+use super::{Company, MARKETWATCH};
 use crate::RelativeDay;
 
-use super::{Company, MARKETWATCH};
+const SYMBOL_SELECTOR: &str =
+    "div>div>table>tbody>tr>td[class=\"overflow__cell align--left\"]>div>a";
+const COMPANY_NAME_SELECTOR: &str =
+    "div>div>table>tbody>tr>td[class=\"overflow__cell fixed--column align--left\"]>div[class=\"cell__content fixed--cell\"]>a";
+const PREVIOUS_WEEK_SELECTOR: &str = "li[class=\"tab__item prev week\"]";
+const NEXT_WEEK_SELECTOR: &str = "li[class=\"tab__item next week\"]";
+const PREVIOUS_DAY_SELECTOR: &str = "li[class=\"tab__item prev day\"]";
+const NEXT_DAY_SELECTOR: &str = "li[class=\"tab__item next day\"]";
+const COOKIES_AGREE_BUTTON_SELECTOR: &str = "button[class=\"message-component message-button no-children focusable agree-btn sp_choice_type_11\"]";
+const COOKIE_MESSAGE_IFRAME: &str = "sp_message_iframe_719544";
+const WAIT_INTERVAL: Duration = Duration::from_secs(1);
+const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
+const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
 
-pub async fn get_marketwatch_data(
+pub async fn get_data(
     driver: &WebDriver,
     day: RelativeDay,
 ) -> anyhow::Result<Vec<Company>> {
@@ -36,7 +49,7 @@ pub async fn get_marketwatch_data(
         }
         _ => (),
     }
-    get_data(driver, target).await
+    parse_data(driver, target).await
 }
 
 async fn to_previous_week(driver: &WebDriver) -> anyhow::Result<()> {
@@ -97,7 +110,7 @@ async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn get_data(
+async fn parse_data(
     driver: &WebDriver,
     date: NaiveDate,
 ) -> anyhow::Result<Vec<Company>> {
@@ -143,18 +156,3 @@ async fn get_data(
 
     Ok(companies)
 }
-
-// Children of the parent div with date.
-const SYMBOL_SELECTOR: &str =
-    "div>div>table>tbody>tr>td[class=\"overflow__cell align--left\"]>div>a";
-const COMPANY_NAME_SELECTOR: &str =
-    "div>div>table>tbody>tr>td[class=\"overflow__cell fixed--column align--left\"]>div[class=\"cell__content fixed--cell\"]>a";
-const PREVIOUS_WEEK_SELECTOR: &str = "li[class=\"tab__item prev week\"]";
-const NEXT_WEEK_SELECTOR: &str = "li[class=\"tab__item next week\"]";
-const PREVIOUS_DAY_SELECTOR: &str = "li[class=\"tab__item prev day\"]";
-const NEXT_DAY_SELECTOR: &str = "li[class=\"tab__item next day\"]";
-const COOKIES_AGREE_BUTTON_SELECTOR: &str = "button[class=\"message-component message-button no-children focusable agree-btn sp_choice_type_11\"]";
-const COOKIE_MESSAGE_IFRAME: &str = "sp_message_iframe_719544";
-const WAIT_INTERVAL: Duration = Duration::from_secs(1);
-const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
-const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);

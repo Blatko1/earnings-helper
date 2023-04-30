@@ -1,18 +1,20 @@
-use std::io::{self, Write};
+use std::io::Write;
 
 use chrono::{Days, NaiveDate};
 use thirtyfour::WebDriver;
 
-mod marketwatch;
-mod zacks;
+mod investing_parser;
+mod marketwatch_parser;
+mod tradingview_parser;
+mod zacks_parser;
 
 const MARKETWATCH: &str = "https://www.marketwatch.com/tools/earnings-calendar";
 const ZACKS: &str = "https://www.zacks.com/earnings/earnings-calendar?icid=earnings-earnings-nav_tracking-zcom-main_menu_wrapper-earnings_calendar";
 const BENZINGA: &str = "https://www.benzinga.com/calendars/earnings";
 const INVESTING: &str = "https://www.investing.com/earnings-calendar/";
 const CNBC: &str = "https://www.cnbc.com/earnings-calendar/";
-const EARNINGS_WHISPERS: &str = "https://www.earningswhispers.com/calendar";
-const TRADING_VIEW: &str =
+const EARNINGSWHISPERS: &str = "https://www.earningswhispers.com/calendar";
+const TRADINGVIEW: &str =
     "https://www.tradingview.com/markets/stocks-usa/earnings/";
 
 #[derive(Debug, Clone)]
@@ -29,7 +31,7 @@ pub async fn marketwatch_data(
     let mut max_reruns = 1;
     loop {
         std::io::stdout().flush()?;
-        match marketwatch::get_marketwatch_data(driver, day).await {
+        match marketwatch_parser::get_data(driver, day).await {
             Ok(c) => {
                 println!("Success!");
                 return Ok(c);
@@ -53,7 +55,32 @@ pub async fn zacks_data(
 ) -> anyhow::Result<Vec<Company>> {
     print!("Reading 'Zacks' data...");
     std::io::stdout().flush()?;
-    let data = zacks::get_zacks_data(driver, day).await.unwrap();
+    let data = zacks_parser::get_data(driver, day).await.unwrap();
+    println!("Success!");
+    std::io::stdout().flush()?;
+    Ok(data)
+}
+
+/// Loads maximum results of 150.
+pub async fn tradingview_data(
+    driver: &WebDriver,
+    day: RelativeDay,
+) -> anyhow::Result<Vec<Company>> {
+    print!("Reading 'TradingView' data...");
+    std::io::stdout().flush()?;
+    let data = tradingview_parser::get_data(driver, day).await.unwrap();
+    println!("Success!");
+    std::io::stdout().flush()?;
+    Ok(data)
+}
+
+pub async fn investing_data(
+    driver: &WebDriver,
+    day: RelativeDay,
+) -> anyhow::Result<Vec<Company>> {
+    print!("Reading 'Investing' data...");
+    std::io::stdout().flush()?;
+    let data = investing_parser::get_data(driver, day).await.unwrap();
     println!("Success!");
     std::io::stdout().flush()?;
     Ok(data)

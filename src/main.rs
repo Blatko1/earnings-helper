@@ -1,8 +1,8 @@
 mod websites;
 
+use crate::websites::RelativeDay;
 use std::io::Write;
 use thirtyfour::{DesiredCapabilities, WebDriver};
-use crate::websites::RelativeDay;
 
 #[tokio::main]
 async fn main() {
@@ -16,11 +16,19 @@ async fn main() {
         .unwrap();
     println!("Success!");
 
-    let day = RelativeDay::Today;
+    let day = RelativeDay::Tomorrow;
+
     let companies1 = websites::marketwatch_data(&driver, day).await.unwrap();
     println!("companise: {:?}", companies1);
 
     let companies2 = websites::zacks_data(&driver, day).await.unwrap();
+    println!("companies2: {:?}", companies2);
+
+    let companies3 = websites::tradingview_data(&driver, day).await.unwrap();
+    println!("companies3: {:?}", companies3);
+
+    let companies4 = websites::investing_data(&driver, day).await.unwrap();
+    println!("companies4: {:?}", companies4);
 
     driver.quit().await.unwrap();
 }
