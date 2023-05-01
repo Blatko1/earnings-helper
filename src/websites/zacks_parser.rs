@@ -7,6 +7,11 @@ use crate::RelativeDay;
 
 const PREVIOUS_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_left\"]>a";
 const NEXT_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_right\"]>a";
+const SHOW_ENTRIES_SELECTOR: &str =
+    "div#earnings_rel_data_all_table_length>label>select";
+const SYMBOL_SELECTOR: &str = "table#earnings_rel_data_all_table>tbody>tr>th>a>span";
+const COMPANY_NAME_SELECTOR: &str = "table#earnings_rel_data_all_table>tbody>tr>td:nth-child(2)>span";
+const SHOW_ALL_BUTTON_SELECTOR: &str = "option[value=\"-1\"]";
 const WAIT_INTERVAL: Duration = Duration::from_secs(1);
 const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
 const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
@@ -14,8 +19,6 @@ const SCROLL_INTO_VIEW: &str =
     r#"arguments[0].scrollIntoView({behavior: "auto", block: "center"});"#;
 const COOKIE_ACCEPT_ID: &str = "accept_cookie";
 const EVENTS_TITLE: &str = "WeeklyEventsTitle";
-const COPY_BUTTON_SELECTOR: &str =
-    "a[class=\"dt-button buttons-copy buttons-html5\"]";
 
 pub async fn get_data(
     driver: &WebDriver,
@@ -88,6 +91,10 @@ async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
     Ok(())
 }
 
+// TODO add By:Css or By::Id to consts
+// TODO put TIMEOUT const and WAIT INTERVAL and other const in mod.rs
+
+// TODO branch this function into smaller functions.
 async fn parse_data(
     driver: &WebDriver,
     date: NaiveDate,
@@ -137,34 +144,58 @@ async fn parse_data(
     } else {
         return Ok(vec![]);
     }
-    let button = driver
-        .query(By::Css(COPY_BUTTON_SELECTOR))
+
+    let selector = driver
+        .query(By::Css(SHOW_ENTRIES_SELECTOR))
         .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
+        .desc("Find entries selector")
         .single()
         .await?;
     driver
-        .execute(SCROLL_INTO_VIEW, vec![button.to_json()?])
+        .execute(SCROLL_INTO_VIEW, vec![selector.to_json()?])
         .await?;
-    button.click().await?;
-    let mut clipboard = arboard::Clipboard::new()?;
-    let data = clipboard.get_text()?;
-    let companies = parse_data_table(data);
+    selector.click().await?;
+    driver
+        .query(By::Css(SHOW_ALL_BUTTON_SELECTOR))
+        .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
+        .desc("Click on the 'show all' button")
+        .single()
+        .await?
+        .click()
+        .await?;
+
+    let source = driver.source().await?;
+    let document = scraper::Html::parse_document(&source);
+    let symbol_selector = scraper::Selector::parse(SYMBOL_SELECTOR)
+        .map_err(|e| eprintln!("{e}"))
+        .unwrap();
+    let names_selector = scraper::Selector::parse(COMPANY_NAME_SELECTOR)
+        .map_err(|e| eprintln!("{e}"))
+        .unwrap();
+    let mut symbols: Vec<String> = document
+        .select(&symbol_selector)
+        .map(|e| e.inner_html())
+        .collect();
+    let names: Vec<String> = document
+        .select(&names_selector)
+        .map(|e| e.inner_html())
+        .collect();
+
+    for sym in symbols.iter_mut(){
+        *sym = sym.split('<').collect::<Vec<&str>>()[0].to_string();
+    }
+    assert_eq!(symbols.len(), names.len());
+    
+    let companies: Vec<Company> = symbols
+        .iter()
+        .zip(names.iter())
+        .map(|(s, n)| Company {
+            symbol: s.clone(),
+            name: n.clone(),
+        })
+        .collect();
 
     Ok(companies)
-}
-
-fn parse_data_table(data: String) -> Vec<Company> {
-    let mut lines: Vec<&str> = data.split('\n').collect();
-    lines.remove(0);
-    let mut result = Vec::with_capacity(lines.len());
-    for l in lines {
-        let fields: Vec<&str> = l.trim().split('\t').collect();
-        result.push(Company {
-            symbol: fields[0].to_string(),
-            name: fields[1].to_string(),
-        });
-    }
-    result
 }
 
 #[test]

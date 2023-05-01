@@ -5,7 +5,8 @@ use super::{Company, INVESTING};
 use crate::RelativeDay;
 
 const COOKIE_ACCEPT_ID: &str = "onetrust-accept-btn-handler";
-const POPUP_CLOSE_BUTTON_SELECTOR: &str = "i[class=\"popupCloseIcon largeBannerCloser\"]";
+const POPUP_CLOSE_BUTTON_SELECTOR: &str =
+    "i[class=\"popupCloseIcon largeBannerCloser\"]";
 const PREVIOUS_DAY_ID: &str = "timeFrame_yesterday";
 const SYMBOL_SELECTOR: &str = "a[class=\"bold middle\"]";
 const COMPANY_NAME_SELECTOR: &str = "span[class=\"earnCalCompanyName middle\"]";
@@ -25,9 +26,8 @@ pub async fn get_data(
     // Accept cookies in order to remove the cookies 'obstacle' dialog box.
     accept_cookies(driver).await?;
 
-    // Wait for the popup to show (sometimes)
-    tokio::time::sleep(LOAD_WAIT).await;
-    close_popup(driver).await.unwrap_or_else(|_|{});
+    // Close the popup if it appears
+    close_popup(driver).await.unwrap_or_else(|_| {});
 
     match day {
         RelativeDay::Yesterday => to_previous_day(driver).await?,
@@ -125,9 +125,14 @@ async fn parse_data(driver: &WebDriver) -> anyhow::Result<Vec<Company>> {
         .collect();
     assert_eq!(symbols.len(), names.len());
 
-    let companies: Vec<Company> = symbols.iter().zip(names.iter()).map(|(s, n)| {
-        Company { symbol: s.clone(), name: n.clone() }
-    }).collect();
+    let companies: Vec<Company> = symbols
+        .iter()
+        .zip(names.iter())
+        .map(|(s, n)| Company {
+            symbol: s.clone(),
+            name: n.clone(),
+        })
+        .collect();
 
     Ok(companies)
 }

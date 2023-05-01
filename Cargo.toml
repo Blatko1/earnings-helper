@@ -11,4 +11,3 @@ anyhow = "1.0.70"
 chrono = "0.4.24"
 tokio = { version = "1.27.0", features = ["full"] }
 thirtyfour = "0.31.0"
-arboard = "3.2.0"
