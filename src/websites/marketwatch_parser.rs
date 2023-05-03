@@ -1,9 +1,8 @@
 use chrono::{Datelike, NaiveDate, Weekday};
-use std::time::Duration;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
-use super::{Company, MARKETWATCH};
-use crate::RelativeDay;
+use super::{Company, MARKETWATCH, TIMEOUT_FIVE_SEC, WAIT_INTERVAL};
+use crate::{websites::TIMEOUT_TEN_SEC, RelativeDay};
 
 const SYMBOL_SELECTOR: &str =
     "div>div>table>tbody>tr>td[class=\"overflow__cell align--left\"]>div>a";
@@ -15,9 +14,6 @@ const PREVIOUS_DAY_SELECTOR: &str = "li[class=\"tab__item prev day\"]";
 const NEXT_DAY_SELECTOR: &str = "li[class=\"tab__item next day\"]";
 const COOKIES_AGREE_BUTTON_SELECTOR: &str = "button[class=\"message-component message-button no-children focusable agree-btn sp_choice_type_11\"]";
 const COOKIE_MESSAGE_IFRAME: &str = "sp_message_iframe_719544";
-const WAIT_INTERVAL: Duration = Duration::from_secs(1);
-const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
-const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
 
 pub async fn get_data(
     driver: &WebDriver,

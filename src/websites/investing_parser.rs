@@ -1,7 +1,10 @@
-use std::{time::Duration, vec};
+use std::vec;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
-use super::{Company, INVESTING};
+use super::{
+    Company, INVESTING, LOAD_WAIT, TIMEOUT_FIVE_SEC, TIMEOUT_THREE_SEC,
+    WAIT_INTERVAL, SCROLL_INTO_VIEW,
+};
 use crate::RelativeDay;
 
 const COOKIE_ACCEPT_ID: &str = "onetrust-accept-btn-handler";
@@ -12,11 +15,6 @@ const SYMBOL_SELECTOR: &str = "a[class=\"bold middle\"]";
 const COMPANY_NAME_SELECTOR: &str = "span[class=\"earnCalCompanyName middle\"]";
 const TODAY_DAY_ID: &str = "timeFrame_today";
 const NEXT_DAY_ID: &str = "timeFrame_tomorrow";
-const WAIT_INTERVAL: Duration = Duration::from_secs(1);
-const LOAD_WAIT: Duration = Duration::from_secs(2);
-const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
-const SCROLL_INTO_VIEW: &str =
-    r#"arguments[0].scrollIntoView({behavior: "auto", block: "center"});"#;
 
 pub async fn get_data(
     driver: &WebDriver,
@@ -97,7 +95,7 @@ async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
 async fn close_popup(driver: &WebDriver) -> anyhow::Result<()> {
     driver
         .query(By::Css(POPUP_CLOSE_BUTTON_SELECTOR))
-        .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
+        .wait(TIMEOUT_THREE_SEC, WAIT_INTERVAL)
         .desc("Find popup close button")
         .single()
         .await?

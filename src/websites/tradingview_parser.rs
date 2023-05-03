@@ -1,18 +1,13 @@
-use std::{time::Duration, vec};
+use std::vec;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
-use super::{Company, TRADINGVIEW};
+use super::{Company, LOAD_WAIT, TIMEOUT_FIVE_SEC, TRADINGVIEW, WAIT_INTERVAL, SCROLL_INTO_VIEW};
 use crate::RelativeDay;
 
 const DAY_SELECTOR: &str = "div[class=\"itemContent-LeZwGiB6\"]";
 const SYMBOL_SELECTOR: &str =
     "a[class=\"tv-screener__symbol apply-common-tooltip\"]";
 const COMPANY_NAME_SELECTOR: &str = "span[class=\"tv-screener__description\"]";
-const WAIT_INTERVAL: Duration = Duration::from_secs(1);
-const LOAD_WAIT: Duration = Duration::from_secs(2);
-const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
-const SCROLL_INTO_VIEW: &str =
-    r#"arguments[0].scrollIntoView({behavior: "auto", block: "center"});"#;
 
 pub async fn get_data(
     driver: &WebDriver,

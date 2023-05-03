@@ -1,22 +1,19 @@
 use chrono::{Datelike, Days, NaiveDate, Weekday};
-use std::{time::Duration, vec};
+use std::vec;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
-use super::{Company, ZACKS};
+use super::{Company, TIMEOUT_FIVE_SEC, TIMEOUT_TEN_SEC, WAIT_INTERVAL, ZACKS, SCROLL_INTO_VIEW};
 use crate::RelativeDay;
 
 const PREVIOUS_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_left\"]>a";
 const NEXT_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_right\"]>a";
 const SHOW_ENTRIES_SELECTOR: &str =
     "div#earnings_rel_data_all_table_length>label>select";
-const SYMBOL_SELECTOR: &str = "table#earnings_rel_data_all_table>tbody>tr>th>a>span";
-const COMPANY_NAME_SELECTOR: &str = "table#earnings_rel_data_all_table>tbody>tr>td:nth-child(2)>span";
+const SYMBOL_SELECTOR: &str =
+    "table#earnings_rel_data_all_table>tbody>tr>th>a>span";
+const COMPANY_NAME_SELECTOR: &str =
+    "table#earnings_rel_data_all_table>tbody>tr>td:nth-child(2)>span";
 const SHOW_ALL_BUTTON_SELECTOR: &str = "option[value=\"-1\"]";
-const WAIT_INTERVAL: Duration = Duration::from_secs(1);
-const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
-const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
-const SCROLL_INTO_VIEW: &str =
-    r#"arguments[0].scrollIntoView({behavior: "auto", block: "center"});"#;
 const COOKIE_ACCEPT_ID: &str = "accept_cookie";
 const EVENTS_TITLE: &str = "WeeklyEventsTitle";
 
@@ -181,11 +178,11 @@ async fn parse_data(
         .map(|e| e.inner_html())
         .collect();
 
-    for sym in symbols.iter_mut(){
+    for sym in symbols.iter_mut() {
         *sym = sym.split('<').collect::<Vec<&str>>()[0].to_string();
     }
     assert_eq!(symbols.len(), names.len());
-    
+
     let companies: Vec<Company> = symbols
         .iter()
         .zip(names.iter())
