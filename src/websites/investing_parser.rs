@@ -25,7 +25,7 @@ pub async fn get_data(
     accept_cookies(driver).await?;
 
     // Close the popup if it appears
-    close_popup(driver).await.unwrap_or_else(|_| {});
+    close_popup(driver).await.unwrap_or(());
 
     match day {
         RelativeDay::Yesterday => to_previous_day(driver).await?,
