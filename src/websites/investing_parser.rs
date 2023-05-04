@@ -2,8 +2,8 @@ use std::vec;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
 use super::{
-    Company, INVESTING, LOAD_WAIT, TIMEOUT_FIVE_SEC, TIMEOUT_THREE_SEC,
-    WAIT_INTERVAL, SCROLL_INTO_VIEW,
+    Company, INVESTING, LOAD_WAIT, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC,
+    TIMEOUT_THREE_SEC, WAIT_INTERVAL,
 };
 use crate::RelativeDay;
 

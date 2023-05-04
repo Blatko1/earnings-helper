@@ -2,7 +2,10 @@ use chrono::{Datelike, Days, NaiveDate, Weekday};
 use std::vec;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
-use super::{Company, TIMEOUT_FIVE_SEC, TIMEOUT_TEN_SEC, WAIT_INTERVAL, ZACKS, SCROLL_INTO_VIEW};
+use super::{
+    Company, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC, TIMEOUT_TEN_SEC,
+    WAIT_INTERVAL, ZACKS,
+};
 use crate::RelativeDay;
 
 const PREVIOUS_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_left\"]>a";

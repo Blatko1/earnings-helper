@@ -3,11 +3,11 @@ use std::{io::Write, time::Duration};
 use chrono::{Days, NaiveDate};
 use thirtyfour::WebDriver;
 
+mod benzinga_parser;
 mod investing_parser;
 mod marketwatch_parser;
 mod tradingview_parser;
 mod zacks_parser;
-mod benzinga_parser;
 
 const MARKETWATCH: &str = "https://www.marketwatch.com/tools/earnings-calendar";
 const ZACKS: &str = "https://www.zacks.com/earnings/earnings-calendar?icid=earnings-earnings-nav_tracking-zcom-main_menu_wrapper-earnings_calendar";
@@ -136,7 +136,8 @@ pub async fn investing_data(
     }
 }
 
-pub async fn benzinga_data(driver: &WebDriver,
+pub async fn benzinga_data(
+    driver: &WebDriver,
     day: RelativeDay,
 ) -> anyhow::Result<Vec<Company>> {
     print!("Reading 'Benzinga' data...");
