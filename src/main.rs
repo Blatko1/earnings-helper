@@ -5,7 +5,7 @@ use std::io::Write;
 use thirtyfour::{DesiredCapabilities, WebDriver};
 use websites::Company;
 
-const MINIMUM_REFERENCES: usize = 5;
+const MINIMUM_REFERENCES: usize = 4;
 
 #[tokio::main]
 async fn main() {
@@ -39,6 +39,7 @@ async fn main() {
         investing_data,
         benzinga_data,
     ]);
+    std::io::stdout().flush().unwrap();
 
     println!("FINALI: {candidates:?}")
 }
@@ -48,7 +49,7 @@ fn eval_candidates(data: Vec<Vec<Company>>) -> Vec<CompanyCandidate> {
     let capacity = data.iter().map(|d| d.len()).sum();
     let avg = capacity / data.len();
 
-    // Holds all parsed entries do the name is 'duplicate candidates'.
+    // Holds all parsed entries, so the name is 'duplicate candidates'.
     let mut dup_candidates = Vec::with_capacity(capacity);
     for d in data.into_iter() {
         for c in d.into_iter() {
@@ -59,11 +60,15 @@ fn eval_candidates(data: Vec<Vec<Company>>) -> Vec<CompanyCandidate> {
     let mut result = Vec::with_capacity(avg);
     loop {
         let mut references: usize = 1;
-        let company = dup_candidates.swap_remove(0);
+        let mut company = dup_candidates.swap_remove(0);
         loop {
             if let Some(i) = dup_candidates.iter().position(|c| c.eq(&company)) {
                 references = references + 1;
-                dup_candidates.swap_remove(i);
+                let dup = dup_candidates.swap_remove(i);
+                // If variable's 'company' name is empty insert duplicate's.
+                if company.name.is_empty() {
+                    company.name = dup.name;
+                }
                 continue;
             }
             break;
@@ -78,8 +83,10 @@ fn eval_candidates(data: Vec<Vec<Company>>) -> Vec<CompanyCandidate> {
             break;
         }
     }
-    println!(" Success!");
-    println!("Number of parsed entries: {capacity}");
+    println!(" Done!");
+    println!("Number of entries (no filter): {capacity}");
+    println!("Filtering entries with minimum of {} references.", MINIMUM_REFERENCES);
+    println!("Number of entries after filtering: {}", result.len());
 
     result
 }
