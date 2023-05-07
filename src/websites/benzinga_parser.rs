@@ -10,9 +10,9 @@ use super::{
 };
 use crate::RelativeDay;
 
-const POPUP_CLOSE_BUTTON_ID1: &str =
-    "prosper-ButtonElement--nx7cDtB7lcsPz0HGXS82";
-const POPUP_CLOSE_BUTTON_ID2: &str =
+const POPUP_CLOSE_BUTTON1_SELECTOR: &str =
+    "button[class=\"StyledIconButtonElement-sc-114x20d-0 jdccT prosper-field-button\"";
+const POPUP_CLOSE_BUTTON2_SELECTOR: &str =
     "armington-ButtonElement--KAlieQqWWrwt2Isu6MDd";
 const PREVIOUS_MONTH_BUTTON_SELECTOR: &str =
     "span[class=\"DayPicker-NavButton DayPicker-NavButton--prev\"]";
@@ -93,8 +93,8 @@ async fn to_previous_month(driver: &WebDriver) -> anyhow::Result<()> {
 
 async fn close_popup(driver: &WebDriver) -> anyhow::Result<()> {
     let button = driver
-        .query(By::Id(POPUP_CLOSE_BUTTON_ID1))
-        .or(By::Id(POPUP_CLOSE_BUTTON_ID2))
+        .query(By::Css(POPUP_CLOSE_BUTTON1_SELECTOR))
+        .or(By::Id(POPUP_CLOSE_BUTTON2_SELECTOR))
         .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
         .desc("Find popup close button")
         .single()
@@ -121,7 +121,6 @@ async fn parse_data(driver: &WebDriver) -> anyhow::Result<Vec<Company>> {
         .select(&symbol_selector)
         .map(|e| e.inner_html())
         .collect();
-    assert_eq!(symbols.len(), 73);
 
     let companies: Vec<Company> = symbols
         .iter()

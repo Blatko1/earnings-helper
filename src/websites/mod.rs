@@ -13,7 +13,7 @@ const MARKETWATCH: &str = "https://www.marketwatch.com/tools/earnings-calendar";
 const ZACKS: &str = "https://www.zacks.com/earnings/earnings-calendar?icid=earnings-earnings-nav_tracking-zcom-main_menu_wrapper-earnings_calendar";
 const BENZINGA: &str = "https://www.benzinga.com/calendars/earnings";
 const INVESTING: &str = "https://www.investing.com/earnings-calendar/";
-const EARNINGSWHISPERS: &str = "https://www.earningswhispers.com/calendar";
+// const EARNINGSWHISPERS: &str = "https://www.earningswhispers.com/calendar";
 const TRADINGVIEW: &str =
     "https://www.tradingview.com/markets/stocks-usa/earnings/";
 const SCROLL_INTO_VIEW: &str =
@@ -25,10 +25,28 @@ const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
 const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
 const MAX_RERUNS: usize = 1;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq)]
 pub struct Company {
     pub symbol: String,
     pub name: String,
+}
+
+impl PartialEq for Company {
+    fn eq(&self, other: &Self) -> bool {
+        self.symbol == other.symbol
+    }
+}
+
+impl PartialOrd for Company {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.symbol.partial_cmp(&other.symbol)
+    }
+}
+
+impl Ord for Company {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.symbol.cmp(&other.symbol)
+    }
 }
 
 pub async fn marketwatch_data(
