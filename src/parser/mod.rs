@@ -52,11 +52,11 @@ pub async fn parse_website_data() -> anyhow::Result<(Vec<Company>, usize)> {
     let day = RelativeDay::Tomorrow;
 
     let web_parsers = vec![
-        //Parser::Marketwatch,
-        //Parser::Zacks,
-        //Parser::Tradingview,
+        Parser::Marketwatch,
+        Parser::Zacks,
+        Parser::Tradingview,
         Parser::Investing,
-        //Parser::Benzinga,
+        Parser::Benzinga,
     ];
     let parsed = parse_all(&driver, day, web_parsers).await?;
 

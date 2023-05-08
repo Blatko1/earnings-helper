@@ -7,7 +7,7 @@ use thirtyfour::{
 
 use super::{
     Company, WebsiteParser, BENZINGA, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC,
-    TIMEOUT_TEN_SEC, WAIT_INTERVAL,
+    TIMEOUT_TEN_SEC, WAIT_INTERVAL, LOAD_WAIT_SHORT,
 };
 use crate::RelativeDay;
 
@@ -23,9 +23,6 @@ const SYMBOL_SELECTOR: &str = "tr[class=\"ant-table-row ant-table-row-level-0\"]
 
 pub struct BenzingaParser {}
 
-// Site opens -> wait for the popup and close it
-// -> choose a date on calendar -> find data in html source
-
 #[async_trait]
 impl WebsiteParser for BenzingaParser {
     const NAME: &'static str = "Benzinga";
@@ -35,13 +32,11 @@ impl WebsiteParser for BenzingaParser {
         day: RelativeDay,
     ) -> anyhow::Result<Vec<Company>> {
         driver.goto(BENZINGA).await?;
-        // Close the popup
         close_popup(driver).await?;
 
         pick_date(driver, day).await?;
-
         // Wait for the results to load
-        tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
+        tokio::time::sleep(LOAD_WAIT_SHORT).await;
 
         parse_data(driver).await
     }
