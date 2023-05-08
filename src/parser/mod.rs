@@ -23,15 +23,19 @@ const INVESTING: &str = "https://www.investing.com/earnings-calendar/";
 // const EARNINGSWHISPERS: &str = "https://www.earningswhispers.com/calendar";
 const TRADINGVIEW: &str =
     "https://www.tradingview.com/markets/stocks-usa/earnings/";
+
 const SCROLL_INTO_VIEW: &str =
     r#"arguments[0].scrollIntoView({behavior: "auto", block: "center"});"#;
-const WAIT_INTERVAL: Duration = Duration::from_secs(1);
+const WAIT_INTERVAL: Duration = Duration::from_millis(400);
+const LOAD_WAIT_SHORT: Duration = Duration::from_secs(1);
 const LOAD_WAIT: Duration = Duration::from_secs(2);
 const TIMEOUT_THREE_SEC: Duration = Duration::from_secs(3);
 const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
 const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
 const MAX_RERUNS: usize = 1;
 
+/// Returns all parsed data in one `Vec` with an average of entries
+/// per parsed website.
 pub async fn parse_website_data() -> anyhow::Result<(Vec<Company>, usize)> {
     let mut stdout = std::io::stdout().lock();
     write!(stdout, "Initializing WebDriver...")?;
@@ -48,11 +52,11 @@ pub async fn parse_website_data() -> anyhow::Result<(Vec<Company>, usize)> {
     let day = RelativeDay::Tomorrow;
 
     let web_parsers = vec![
-        Parser::Marketwatch,
-        Parser::Zacks,
-        Parser::Tradingview,
+        //Parser::Marketwatch,
+        //Parser::Zacks,
+        //Parser::Tradingview,
         Parser::Investing,
-        Parser::Benzinga,
+        //Parser::Benzinga,
     ];
     let parsed = parse_all(&driver, day, web_parsers).await?;
 

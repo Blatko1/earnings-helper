@@ -3,8 +3,8 @@ use std::vec;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
 use super::{
-    Company, WebsiteParser, INVESTING, LOAD_WAIT, SCROLL_INTO_VIEW,
-    TIMEOUT_FIVE_SEC, TIMEOUT_THREE_SEC, WAIT_INTERVAL,
+    Company, WebsiteParser, INVESTING, SCROLL_INTO_VIEW,
+    TIMEOUT_FIVE_SEC, TIMEOUT_THREE_SEC, WAIT_INTERVAL, LOAD_WAIT_SHORT,
 };
 use crate::RelativeDay;
 
@@ -32,7 +32,7 @@ impl WebsiteParser for InvestingParser {
         accept_cookies(driver).await?;
 
         // Close the popup if it appears
-        close_popup(driver).await.unwrap_or(());
+        //close_popup(driver).await.unwrap_or(());
 
         match day {
             RelativeDay::Yesterday => to_previous_day(driver).await?,
@@ -40,7 +40,7 @@ impl WebsiteParser for InvestingParser {
             RelativeDay::Tomorrow => to_next_day(driver).await?,
         }
         // Wait for the browser to load data table
-        tokio::time::sleep(LOAD_WAIT).await;
+        tokio::time::sleep(LOAD_WAIT_SHORT).await;
 
         parse_data(driver).await
     }
@@ -84,6 +84,7 @@ async fn to_next_day(driver: &WebDriver) -> anyhow::Result<()> {
     driver
         .execute(SCROLL_INTO_VIEW, vec![button.to_json()?])
         .await?;
+    // Surprisingly long block when browser is headless
     button.click().await?;
     Ok(())
 }
