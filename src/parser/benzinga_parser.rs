@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use chrono::Datelike;
 use thirtyfour::{
     prelude::{ElementQueryable, ElementWaitable},
@@ -5,8 +6,8 @@ use thirtyfour::{
 };
 
 use super::{
-    Company, BENZINGA, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC, TIMEOUT_TEN_SEC,
-    WAIT_INTERVAL,
+    Company, WebsiteParser, BENZINGA, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC,
+    TIMEOUT_TEN_SEC, WAIT_INTERVAL,
 };
 use crate::RelativeDay;
 
@@ -20,23 +21,30 @@ const DATE_PICKER_SELECTOR: &str =
     "div[class=\"range-date-picker__field-wrapper\"]";
 const SYMBOL_SELECTOR: &str = "tr[class=\"ant-table-row ant-table-row-level-0\"]>td:nth-child(3)>div>div>div>a";
 
+pub struct BenzingaParser {}
+
 // Site opens -> wait for the popup and close it
 // -> choose a date on calendar -> find data in html source
 
-pub async fn get_data(
-    driver: &WebDriver,
-    day: RelativeDay,
-) -> anyhow::Result<Vec<Company>> {
-    driver.goto(BENZINGA).await?;
-    // Close the popup
-    close_popup(driver).await.unwrap();
+#[async_trait]
+impl WebsiteParser for BenzingaParser {
+    const NAME: &'static str = "Benzinga";
 
-    pick_date(driver, day).await?;
+    async fn parse(
+        driver: &WebDriver,
+        day: RelativeDay,
+    ) -> anyhow::Result<Vec<Company>> {
+        driver.goto(BENZINGA).await?;
+        // Close the popup
+        close_popup(driver).await?;
 
-    // Wait for the results to load
-    tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
+        pick_date(driver, day).await?;
 
-    parse_data(driver).await
+        // Wait for the results to load
+        tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
+
+        parse_data(driver).await
+    }
 }
 
 async fn pick_date(

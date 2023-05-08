@@ -1,8 +1,11 @@
+use async_trait::async_trait;
 use chrono::{Datelike, NaiveDate, Weekday};
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
-use super::{Company, MARKETWATCH, TIMEOUT_FIVE_SEC, WAIT_INTERVAL};
-use crate::{websites::TIMEOUT_TEN_SEC, RelativeDay};
+use super::{
+    Company, WebsiteParser, MARKETWATCH, TIMEOUT_FIVE_SEC, WAIT_INTERVAL,
+};
+use crate::{parser::TIMEOUT_TEN_SEC, RelativeDay};
 
 const SYMBOL_SELECTOR: &str =
     "div>div>table>tbody>tr>td[class=\"overflow__cell align--left\"]>div>a";
@@ -15,37 +18,44 @@ const NEXT_DAY_SELECTOR: &str = "li[class=\"tab__item next day\"]";
 const COOKIES_AGREE_BUTTON_SELECTOR: &str = "button[class=\"message-component message-button no-children focusable agree-btn sp_choice_type_11\"]";
 const COOKIE_MESSAGE_IFRAME: &str = "sp_message_iframe_719544";
 
-pub async fn get_data(
-    driver: &WebDriver,
-    day: RelativeDay,
-) -> anyhow::Result<Vec<Company>> {
-    driver.goto(MARKETWATCH).await?;
-    // If cookies window was not found then make sure to return
-    // back to the default frame.
-    accept_cookies(driver)
-        .await
-        .or(driver.enter_default_frame().await)?;
+pub struct MarketWatchParser {}
 
-    let today = chrono::offset::Local::now().date_naive();
-    let target = day.get_date();
-    let target_weekday = target.weekday();
-    // Weekdays here are counted from Mon to Sun.
-    match today.weekday() {
-        // Check if the target week is before the today week
-        Weekday::Mon => {
-            if target_weekday == Weekday::Sun {
-                to_previous_week(driver).await?;
+#[async_trait]
+impl WebsiteParser for MarketWatchParser {
+    const NAME: &'static str = "MarketWatch";
+
+    async fn parse(
+        driver: &WebDriver,
+        day: RelativeDay,
+    ) -> anyhow::Result<Vec<Company>> {
+        driver.goto(MARKETWATCH).await?;
+        // If cookies window was not found then make sure to return
+        // back to the default frame.
+        accept_cookies(driver)
+            .await
+            .or(driver.enter_default_frame().await)?;
+
+        let today = chrono::offset::Local::now().date_naive();
+        let target = day.get_date();
+        let target_weekday = target.weekday();
+        // Weekdays here are counted from Mon to Sun.
+        match today.weekday() {
+            // Check if the target week is before the today week
+            Weekday::Mon => {
+                if target_weekday == Weekday::Sun {
+                    to_previous_week(driver).await?;
+                }
             }
-        }
-        // Check if the target week is after the today week
-        Weekday::Sun => {
-            if target_weekday == Weekday::Mon {
-                to_next_week(driver).await?;
+            // Check if the target week is after the today week
+            Weekday::Sun => {
+                if target_weekday == Weekday::Mon {
+                    to_next_week(driver).await?;
+                }
             }
+            _ => (),
         }
-        _ => (),
+        parse_data(driver, target).await
     }
-    parse_data(driver, target).await
 }
 
 async fn to_previous_week(driver: &WebDriver) -> anyhow::Result<()> {

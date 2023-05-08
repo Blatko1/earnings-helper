@@ -1,9 +1,10 @@
+use async_trait::async_trait;
 use std::vec;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
 use super::{
-    Company, INVESTING, LOAD_WAIT, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC,
-    TIMEOUT_THREE_SEC, WAIT_INTERVAL,
+    Company, WebsiteParser, INVESTING, LOAD_WAIT, SCROLL_INTO_VIEW,
+    TIMEOUT_FIVE_SEC, TIMEOUT_THREE_SEC, WAIT_INTERVAL,
 };
 use crate::RelativeDay;
 
@@ -16,26 +17,33 @@ const COMPANY_NAME_SELECTOR: &str = "span[class=\"earnCalCompanyName middle\"]";
 const TODAY_DAY_ID: &str = "timeFrame_today";
 const NEXT_DAY_ID: &str = "timeFrame_tomorrow";
 
-pub async fn get_data(
-    driver: &WebDriver,
-    day: RelativeDay,
-) -> anyhow::Result<Vec<Company>> {
-    driver.goto(INVESTING).await?;
-    // Accept cookies in order to remove the cookies 'obstacle' dialog box.
-    accept_cookies(driver).await?;
+pub struct InvestingParser {}
 
-    // Close the popup if it appears
-    close_popup(driver).await.unwrap_or(());
+#[async_trait]
+impl WebsiteParser for InvestingParser {
+    const NAME: &'static str = "Investing";
 
-    match day {
-        RelativeDay::Yesterday => to_previous_day(driver).await?,
-        RelativeDay::Today => to_today_day(driver).await?,
-        RelativeDay::Tomorrow => to_next_day(driver).await?,
+    async fn parse(
+        driver: &WebDriver,
+        day: RelativeDay,
+    ) -> anyhow::Result<Vec<Company>> {
+        driver.goto(INVESTING).await?;
+        // Accept cookies in order to remove the cookies 'obstacle' dialog box.
+        accept_cookies(driver).await?;
+
+        // Close the popup if it appears
+        close_popup(driver).await.unwrap_or(());
+
+        match day {
+            RelativeDay::Yesterday => to_previous_day(driver).await?,
+            RelativeDay::Today => to_today_day(driver).await?,
+            RelativeDay::Tomorrow => to_next_day(driver).await?,
+        }
+        // Wait for the browser to load data table
+        tokio::time::sleep(LOAD_WAIT).await;
+
+        parse_data(driver).await
     }
-    // Wait for the browser to load data table
-    tokio::time::sleep(LOAD_WAIT).await;
-
-    parse_data(driver).await
 }
 
 async fn to_previous_day(driver: &WebDriver) -> anyhow::Result<()> {

@@ -1,71 +1,53 @@
-mod websites;
+mod parser;
 
-use crate::websites::RelativeDay;
+use crate::parser::RelativeDay;
+use parser::Company;
 use std::io::Write;
-use thirtyfour::{DesiredCapabilities, WebDriver};
-use websites::Company;
 
-const MINIMUM_REFERENCES: usize = 4;
+const MINIMUM_REFERENCES: usize = 3;
+
+#[derive(Debug, Ord, PartialEq, Eq, PartialOrd)]
+struct CompanyCandidate {
+    company: Company,
+    refs: usize,
+}
 
 #[tokio::main]
 async fn main() {
-    print!("Initializing WebDriver...");
-    std::io::stdout().flush().unwrap();
-    let mut caps = DesiredCapabilities::chrome();
-    caps.set_headless().unwrap();
-    let driver = WebDriver::new("http://localhost:9515", caps)
-        .await
-        .map_err(|e| println!("Is chromedriver started? Error: {e}"))
-        .unwrap();
-    println!("Success!");
+    let (data, avg) = parser::parse_website_data().await.unwrap();
 
-    let day = RelativeDay::Tomorrow;
-
-    let marketwatch_data =
-        websites::marketwatch_data(&driver, day).await.unwrap();
-    let zacks_data = websites::zacks_data(&driver, day).await.unwrap();
-    let tradingview_data =
-        websites::tradingview_data(&driver, day).await.unwrap();
-    let investing_data = websites::investing_data(&driver, day).await.unwrap();
-    let benzinga_data = websites::benzinga_data(&driver, day).await.unwrap();
-
-    driver.quit().await.unwrap();
+    println!("Number of entries (no filter): {}", data.len());
+    println!(
+        "Filtering entries with minimum of {} references.",
+        MINIMUM_REFERENCES
+    );
 
     print!("Evaluating parsed companies...");
-    let candidates = eval_candidates(vec![
-        marketwatch_data,
-        zacks_data,
-        tradingview_data,
-        investing_data,
-        benzinga_data,
-    ]);
+    let candidates = eval_candidates(data, avg);
+    println!(" Done!");
+    println!("Number of entries after filtering: {}", candidates.len());
     std::io::stdout().flush().unwrap();
 
     println!("FINALI: {candidates:?}")
 }
 
 /// Evaluate candidates by data corelation.
-fn eval_candidates(data: Vec<Vec<Company>>) -> Vec<CompanyCandidate> {
-    let capacity = data.iter().map(|d| d.len()).sum();
-    let avg = capacity / data.len();
-
-    // Holds all parsed entries, so the name is 'duplicate candidates'.
-    let mut dup_candidates = Vec::with_capacity(capacity);
-    for d in data.into_iter() {
-        for c in d.into_iter() {
-            dup_candidates.push(c)
-        }
-    }
-
+///
+/// `avg` - represents average number of companies parsed per website,
+/// needed for allocating space for [`Vec::with_capacity()`]
+fn eval_candidates(
+    mut data: Vec<Company>,
+    avg: usize,
+) -> Vec<CompanyCandidate> {
     let mut result = Vec::with_capacity(avg);
     loop {
         let mut references: usize = 1;
-        let mut company = dup_candidates.swap_remove(0);
+        let mut company = data.swap_remove(0);
         loop {
-            if let Some(i) = dup_candidates.iter().position(|c| c.eq(&company)) {
-                references = references + 1;
-                let dup = dup_candidates.swap_remove(i);
-                // If variable's 'company' name is empty insert duplicate's.
+            if let Some(i) = data.iter().position(|c| c.eq(&company)) {
+                references += 1;
+                let dup = data.swap_remove(i);
+                // If variable's 'company' name is empty insert duplicate's name.
                 if company.name.is_empty() {
                     company.name = dup.name;
                 }
@@ -79,20 +61,9 @@ fn eval_candidates(data: Vec<Vec<Company>>) -> Vec<CompanyCandidate> {
                 refs: references,
             })
         }
-        if dup_candidates.is_empty() {
+        if data.is_empty() {
             break;
         }
     }
-    println!(" Done!");
-    println!("Number of entries (no filter): {capacity}");
-    println!("Filtering entries with minimum of {} references.", MINIMUM_REFERENCES);
-    println!("Number of entries after filtering: {}", result.len());
-
     result
-}
-
-#[derive(Debug, Ord, PartialEq, Eq, PartialOrd)]
-struct CompanyCandidate {
-    company: Company,
-    refs: usize,
 }

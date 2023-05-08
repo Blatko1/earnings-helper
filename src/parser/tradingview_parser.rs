@@ -1,9 +1,10 @@
+use async_trait::async_trait;
 use std::vec;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
 use super::{
-    Company, LOAD_WAIT, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC, TRADINGVIEW,
-    WAIT_INTERVAL,
+    Company, WebsiteParser, LOAD_WAIT, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC,
+    TRADINGVIEW, WAIT_INTERVAL,
 };
 use crate::RelativeDay;
 
@@ -12,21 +13,28 @@ const SYMBOL_SELECTOR: &str =
     "a[class=\"tv-screener__symbol apply-common-tooltip\"]";
 const COMPANY_NAME_SELECTOR: &str = "span[class=\"tv-screener__description\"]";
 
-pub async fn get_data(
-    driver: &WebDriver,
-    day: RelativeDay,
-) -> anyhow::Result<Vec<Company>> {
-    driver.goto(TRADINGVIEW).await?;
+pub struct TradingViewParser {}
 
-    match day {
-        RelativeDay::Yesterday => to_previous_day(driver).await?,
-        RelativeDay::Tomorrow => to_next_day(driver).await?,
-        _ => (),
+#[async_trait]
+impl WebsiteParser for TradingViewParser {
+    const NAME: &'static str = "TradingView";
+
+    async fn parse(
+        driver: &WebDriver,
+        day: RelativeDay,
+    ) -> anyhow::Result<Vec<Company>> {
+        driver.goto(TRADINGVIEW).await?;
+
+        match day {
+            RelativeDay::Yesterday => to_previous_day(driver).await?,
+            RelativeDay::Tomorrow => to_next_day(driver).await?,
+            _ => (),
+        }
+        // Wait for the browser to load data table
+        tokio::time::sleep(LOAD_WAIT).await;
+
+        parse_data(driver).await
     }
-    // Wait for the browser to load data table
-    tokio::time::sleep(LOAD_WAIT).await;
-
-    parse_data(driver).await
 }
 
 async fn to_previous_day(driver: &WebDriver) -> anyhow::Result<()> {

@@ -1,10 +1,11 @@
+use async_trait::async_trait;
 use chrono::{Datelike, Days, NaiveDate, Weekday};
 use std::vec;
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
 
 use super::{
-    Company, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC, TIMEOUT_TEN_SEC,
-    WAIT_INTERVAL, ZACKS,
+    Company, WebsiteParser, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC,
+    TIMEOUT_TEN_SEC, WAIT_INTERVAL, ZACKS,
 };
 use crate::RelativeDay;
 
@@ -20,35 +21,42 @@ const SHOW_ALL_BUTTON_SELECTOR: &str = "option[value=\"-1\"]";
 const COOKIE_ACCEPT_ID: &str = "accept_cookie";
 const EVENTS_TITLE: &str = "WeeklyEventsTitle";
 
-pub async fn get_data(
-    driver: &WebDriver,
-    day: RelativeDay,
-) -> anyhow::Result<Vec<Company>> {
-    driver.goto(ZACKS).await?;
-    // Accept cookies in order to remove the cookies 'obstacle' dialog box.
-    accept_cookies(driver).await?;
+pub struct ZacksParser {}
 
-    let today = chrono::offset::Local::now().date_naive();
-    let target = day.get_date();
-    let target_weekday = target.weekday();
-    // Weekdays here are counted from Sun to Sat.
-    match today.weekday() {
-        // Check if the target week is before the today week
-        Weekday::Sun => {
-            if target_weekday == Weekday::Sat {
-                to_previous_week(driver).await?;
+#[async_trait]
+impl WebsiteParser for ZacksParser {
+    const NAME: &'static str = "Zacks";
+
+    async fn parse(
+        driver: &WebDriver,
+        day: RelativeDay,
+    ) -> anyhow::Result<Vec<Company>> {
+        driver.goto(ZACKS).await?;
+        // Accept cookies in order to remove the cookies 'obstacle' dialog box.
+        accept_cookies(driver).await?;
+
+        let today = chrono::offset::Local::now().date_naive();
+        let target = day.get_date();
+        let target_weekday = target.weekday();
+        // Weekdays here are counted from Sun to Sat.
+        match today.weekday() {
+            // Check if the target week is before the today week
+            Weekday::Sun => {
+                if target_weekday == Weekday::Sat {
+                    to_previous_week(driver).await?;
+                }
             }
-        }
-        // Check if the target week is after the today week
-        Weekday::Sat => {
-            if target_weekday == Weekday::Sun {
-                to_next_week(driver).await?;
+            // Check if the target week is after the today week
+            Weekday::Sat => {
+                if target_weekday == Weekday::Sun {
+                    to_next_week(driver).await?;
+                }
             }
+            _ => (),
         }
-        _ => (),
+
+        parse_data(driver, target).await
     }
-
-    parse_data(driver, target).await
 }
 
 async fn to_previous_week(driver: &WebDriver) -> anyhow::Result<()> {
