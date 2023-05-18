@@ -29,7 +29,6 @@ const SCROLL_INTO_VIEW: &str =
 const WAIT_INTERVAL: Duration = Duration::from_millis(400);
 const LOAD_WAIT_SHORT: Duration = Duration::from_secs(1);
 const LOAD_WAIT: Duration = Duration::from_secs(2);
-const TIMEOUT_THREE_SEC: Duration = Duration::from_secs(3);
 const TIMEOUT_FIVE_SEC: Duration = Duration::from_secs(5);
 const TIMEOUT_TEN_SEC: Duration = Duration::from_secs(10);
 const MAX_RERUNS: usize = 1;

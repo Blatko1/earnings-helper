@@ -1,0 +1,10 @@
+Refs.		Symbol		Company Name
+5		QBTS		D-Wave Quantum Inc.
+5		GTEC		Greenland Technologies Holding Corp.
+5		CTLT		Catalent Inc.
+5		RBC		RBC Bearings
+4		MSADY		MS&amp;AD Insurance Group Holdings PK
+4		CINT		CI&amp;T Inc.
+5		FL		Foot Locker
+5		DE		Deere &amp; Co.
+4		TKOMY		Tokio Marine Holdings Inc. ADR

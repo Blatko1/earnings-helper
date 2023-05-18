@@ -7,7 +7,7 @@ use super::{
     Company, WebsiteParser, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC,
     TIMEOUT_TEN_SEC, WAIT_INTERVAL, ZACKS,
 };
-use crate::{RelativeDay, parser::LOAD_WAIT_SHORT};
+use crate::{parser::LOAD_WAIT_SHORT, RelativeDay};
 
 const PREVIOUS_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_left\"]>a";
 const NEXT_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_right\"]>a";

@@ -5,6 +5,7 @@ use parser::Company;
 use std::io::Write;
 
 const MINIMUM_REFERENCES: usize = 3;
+const OUTPUT_FILE_NAME: &str = "company_candidates.txt";
 
 #[derive(Debug, Ord, PartialEq, Eq, PartialOrd)]
 struct CompanyCandidate {
@@ -28,10 +29,12 @@ async fn main() {
     println!("Number of entries after filtering: {}", candidates.len());
     std::io::stdout().flush().unwrap();
 
-    println!("FINALI: {candidates:?}")
+    data_file_output(candidates);
 }
 
-/// Evaluate candidates by data corelation.
+/// Evaluate candidates by data corelation. If the parsed company has
+/// multiple duplicates (references) it will be shown if it's more than
+/// the MINIMUM_REFERENCES.
 ///
 /// `avg` - represents average number of companies parsed per website,
 /// needed for allocating space for [`Vec::with_capacity()`]
@@ -66,4 +69,16 @@ fn eval_candidates(
         }
     }
     result
+}
+
+fn data_file_output(data: Vec<CompanyCandidate>) {
+    let mut output = String::new();
+    output.push_str("Refs.\t\tSymbol\t\tCompany Name\n");
+    for d in data.into_iter() {
+        output.push_str(&format!(
+            "{}\t\t{}\t\t{}\n",
+            d.refs, d.company.symbol, d.company.name
+        ));
+    }
+    std::fs::write(OUTPUT_FILE_NAME, output).unwrap();
 }

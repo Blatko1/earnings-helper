@@ -6,8 +6,8 @@ use thirtyfour::{
 };
 
 use super::{
-    Company, WebsiteParser, BENZINGA, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC,
-    TIMEOUT_TEN_SEC, WAIT_INTERVAL, LOAD_WAIT_SHORT,
+    Company, WebsiteParser, BENZINGA, LOAD_WAIT_SHORT, SCROLL_INTO_VIEW,
+    TIMEOUT_FIVE_SEC, TIMEOUT_TEN_SEC, WAIT_INTERVAL,
 };
 use crate::RelativeDay;
 
