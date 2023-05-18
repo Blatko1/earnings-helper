@@ -9,8 +9,8 @@ use super::{
 use crate::RelativeDay;
 
 const COOKIE_ACCEPT_ID: &str = "onetrust-accept-btn-handler";
-const POPUP_CLOSE_BUTTON_SELECTOR: &str =
-    "i[class=\"popupCloseIcon largeBannerCloser\"]";
+//const POPUP_CLOSE_BUTTON_SELECTOR: &str =
+//    "i[class=\"popupCloseIcon largeBannerCloser\"]";
 const PREVIOUS_DAY_ID: &str = "timeFrame_yesterday";
 const SYMBOL_SELECTOR: &str = "a[class=\"bold middle\"]";
 const COMPANY_NAME_SELECTOR: &str = "span[class=\"earnCalCompanyName middle\"]";
@@ -101,18 +101,6 @@ async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn close_popup(driver: &WebDriver) -> anyhow::Result<()> {
-    driver
-        .query(By::Css(POPUP_CLOSE_BUTTON_SELECTOR))
-        .wait(TIMEOUT_THREE_SEC, WAIT_INTERVAL)
-        .desc("Find popup close button")
-        .single()
-        .await?
-        .click()
-        .await?;
-    Ok(())
-}
-
 async fn parse_data(driver: &WebDriver) -> anyhow::Result<Vec<Company>> {
     let source = driver.source().await?;
     let document = scraper::Html::parse_document(&source);
@@ -143,3 +131,15 @@ async fn parse_data(driver: &WebDriver) -> anyhow::Result<Vec<Company>> {
 
     Ok(companies)
 }
+
+//async fn close_popup(driver: &WebDriver) -> anyhow::Result<()> {
+//    driver
+//        .query(By::Css(POPUP_CLOSE_BUTTON_SELECTOR))
+//        .wait(TIMEOUT_THREE_SEC, WAIT_INTERVAL)
+//        .desc("Find popup close button")
+//        .single()
+//        .await?
+//        .click()
+//        .await?;
+//    Ok(())
+//}

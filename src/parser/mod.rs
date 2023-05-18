@@ -42,7 +42,7 @@ pub async fn parse_website_data() -> anyhow::Result<(Vec<Company>, usize)> {
     stdout.flush()?;
 
     let mut caps = DesiredCapabilities::chrome();
-    //caps.set_headless()?;
+    caps.set_headless()?;
     let driver = WebDriver::new("http://localhost:9515", caps)
         .await
         .map_err(|e| writeln!(stdout, "Is chromedriver started? Error: {e}"))
@@ -52,15 +52,15 @@ pub async fn parse_website_data() -> anyhow::Result<(Vec<Company>, usize)> {
     let day = RelativeDay::Tomorrow;
 
     let web_parsers = vec![
-        //Parser::Marketwatch,
+        Parser::Marketwatch,
         Parser::Zacks,
-        //Parser::Tradingview,
-        //Parser::Investing,
-        //Parser::Benzinga,
+        Parser::Tradingview,
+        Parser::Investing,
+        Parser::Benzinga,
     ];
     let parsed = parse_all(&driver, day, web_parsers).await?;
 
-    //driver.quit().await?;
+    driver.quit().await?;
 
     let parsed_websites = parsed.len();
     // Store all data into one big array.
