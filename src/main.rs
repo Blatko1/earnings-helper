@@ -4,7 +4,7 @@ use crate::parser::RelativeDay;
 use parser::Company;
 use std::io::Write;
 
-const MINIMUM_REFERENCES: usize = 3;
+const MINIMUM_REFERENCES: usize = 1;
 
 #[derive(Debug, Ord, PartialEq, Eq, PartialOrd)]
 struct CompanyCandidate {

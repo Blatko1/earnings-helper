@@ -29,7 +29,7 @@ impl WebsiteParser for InvestingParser {
     ) -> anyhow::Result<Vec<Company>> {
         driver.goto(INVESTING).await?;
         // Accept cookies in order to remove the cookies 'obstacle' dialog box.
-        accept_cookies(driver).await?;
+        accept_cookies(driver).await.unwrap_or(());
 
         // Close the popup if it appears
         //close_popup(driver).await.unwrap_or(());

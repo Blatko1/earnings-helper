@@ -32,7 +32,7 @@ impl WebsiteParser for BenzingaParser {
         day: RelativeDay,
     ) -> anyhow::Result<Vec<Company>> {
         driver.goto(BENZINGA).await?;
-        close_popup(driver).await?;
+        close_popup(driver).await.unwrap_or(());
 
         pick_date(driver, day).await?;
         // Wait for the results to load

@@ -7,7 +7,7 @@ use super::{
     Company, WebsiteParser, SCROLL_INTO_VIEW, TIMEOUT_FIVE_SEC,
     TIMEOUT_TEN_SEC, WAIT_INTERVAL, ZACKS,
 };
-use crate::RelativeDay;
+use crate::{RelativeDay, parser::TIMEOUT_THREE_SEC};
 
 const PREVIOUS_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_left\"]>a";
 const NEXT_WEEK_SELECTOR: &str = "div[class=\"prenext_txt align_right\"]>a";
@@ -33,7 +33,7 @@ impl WebsiteParser for ZacksParser {
     ) -> anyhow::Result<Vec<Company>> {
         driver.goto(ZACKS).await?;
         // Accept cookies in order to remove the cookies 'obstacle' dialog box.
-        accept_cookies(driver).await?;
+        accept_cookies(driver).await.unwrap_or(());
 
         let today = chrono::offset::Local::now().date_naive();
         let target = day.get_date();
@@ -54,7 +54,6 @@ impl WebsiteParser for ZacksParser {
             }
             _ => (),
         }
-
         parse_data(driver, target).await
     }
 }
@@ -152,7 +151,7 @@ async fn parse_data(
     } else {
         return Ok(vec![]);
     }
-
+    tokio::time::sleep(TIMEOUT_THREE_SEC).await;
     let selector = driver
         .query(By::Css(SHOW_ENTRIES_SELECTOR))
         .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
