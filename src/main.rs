@@ -5,7 +5,6 @@ use crate::parser::RelativeDay;
 use parser::Company;
 use std::io::Write;
 
-const MINIMUM_REFERENCES: usize = 3;
 const OUTPUT_FILE_NAME: &str = "company_candidates.txt";
 
 #[derive(Debug, Ord, PartialEq, Eq, PartialOrd)]
@@ -80,7 +79,7 @@ fn eval_candidates(
             }
             break;
         }
-        if references >= MINIMUM_REFERENCES {
+        if references >= min_refs {
             result.push(CompanyCandidate {
                 company,
                 refs: references,
