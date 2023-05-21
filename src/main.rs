@@ -40,8 +40,12 @@ async fn main() {
     let (data, parsed_websites) =
         parser::parse_website_data(day).await.unwrap();
     let avg = parsed_websites / data.len();
-    write!(stdout, "\nSuccessfully parsed websites: {}", parsed_websites)
-        .unwrap();
+    write!(
+        stdout,
+        "\nSuccessfully parsed websites: {}",
+        parsed_websites
+    )
+    .unwrap();
     write!(
         stdout,
         "\nTotal number of entries (no filter): {}",
@@ -120,6 +124,9 @@ fn data_file_output(data: Vec<CompanyCandidate>) -> anyhow::Result<()> {
         ));
     }
     std::fs::write(OUTPUT_FILE_NAME, output).unwrap();
-    println!("Parsed data saved at:\n\t'{}'", std::fs::canonicalize(OUTPUT_FILE_NAME)?.to_str().unwrap());
+    println!(
+        "Parsed data saved at:\n\t'{}'",
+        std::fs::canonicalize(OUTPUT_FILE_NAME)?.to_str().unwrap()
+    );
     Ok(())
 }
