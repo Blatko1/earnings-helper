@@ -61,7 +61,7 @@ async fn main() {
     write!(stdout, " Done!").unwrap();
     write!(
         stdout,
-        "\nNumber of entries after filtering: {}",
+        "\nNumber of entries after filtering: {}\n",
         candidates.len()
     )
     .unwrap();
