@@ -35,39 +35,39 @@ async fn main() {
     };
 
     let min_references = *matches.get_one::<u8>("refs").unwrap() as usize;
-    write!(stdout, "Minimum references: {min_references}").unwrap();
+    write!(stdout, "\nMinimum references: {min_references}\n").unwrap();
 
     let (data, parsed_websites) =
         parser::parse_website_data(day).await.unwrap();
     let avg = parsed_websites / data.len();
-    write!(stdout, "Successfully parsed websites: {}", parsed_websites)
+    write!(stdout, "\nSuccessfully parsed websites: {}", parsed_websites)
         .unwrap();
     write!(
         stdout,
-        "Total number of entries (no filter): {}",
+        "\nTotal number of entries (no filter): {}",
         data.len()
     )
     .unwrap();
 
     write!(
         stdout,
-        "Entries with less than {} references will be filtered.",
+        "\nEntries with less than {} references will be filtered.",
         min_references
     )
     .unwrap();
-    write!(stdout, "Evaluating parsed companies...").unwrap();
+    write!(stdout, "\nEvaluating parsed companies...").unwrap();
     stdout.flush().unwrap();
     let candidates = eval_candidates(data, min_references, avg);
     write!(stdout, " Done!").unwrap();
     write!(
         stdout,
-        "Number of entries after filtering: {}",
+        "\nNumber of entries after filtering: {}",
         candidates.len()
     )
     .unwrap();
     std::io::stdout().flush().unwrap();
 
-    data_file_output(candidates);
+    data_file_output(candidates).unwrap();
 }
 
 /// Evaluate candidates by data corelation. If the parsed company has
@@ -110,7 +110,7 @@ fn eval_candidates(
     result
 }
 
-fn data_file_output(data: Vec<CompanyCandidate>) {
+fn data_file_output(data: Vec<CompanyCandidate>) -> anyhow::Result<()> {
     let mut output = String::new();
     output.push_str("Refs.\tSymbol \tCompany Name\n");
     for d in data.into_iter() {
@@ -120,4 +120,6 @@ fn data_file_output(data: Vec<CompanyCandidate>) {
         ));
     }
     std::fs::write(OUTPUT_FILE_NAME, output).unwrap();
+    println!("Parsed data: '{}'", std::fs::canonicalize(OUTPUT_FILE_NAME)?.to_str().unwrap());
+    Ok(())
 }
