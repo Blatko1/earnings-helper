@@ -15,38 +15,56 @@ struct CompanyCandidate {
 
 #[tokio::main]
 async fn main() {
+    let mut stdout = std::io::stdout().lock();
     let matches = commands::cmd().get_matches();
 
+    write!(stdout, "Data parsing in progress for: ").unwrap();
+
     let day = if matches.get_flag("tdy") {
+        write!(stdout, "TODAY").unwrap();
         RelativeDay::Today
     } else if matches.get_flag("tmr") {
+        write!(stdout, "TOMORROW").unwrap();
         RelativeDay::Tomorrow
     } else if matches.get_flag("yda") {
+        write!(stdout, "YESTERDAY").unwrap();
         RelativeDay::Yesterday
     } else {
+        write!(stdout, "TODAY").unwrap();
         RelativeDay::Today
     };
+
+    let min_references = *matches.get_one::<u8>("refs").unwrap() as usize;
+    write!(stdout, "Minimum references: {min_references}").unwrap();
 
     let (data, parsed_websites) =
         parser::parse_website_data(day).await.unwrap();
     let avg = parsed_websites / data.len();
-    println!("Total number of entries (no filter): {}", data.len());
+    write!(stdout, "Successfully parsed websites: {}", parsed_websites)
+        .unwrap();
+    write!(
+        stdout,
+        "Total number of entries (no filter): {}",
+        data.len()
+    )
+    .unwrap();
 
-    let min_references = if let Some(&min_refs) = matches.get_one::<u8>("refs")
-    {
-        (min_refs as usize).min(parsed_websites)
-    } else {
-        parsed_websites
-    };
-
-    println!(
+    write!(
+        stdout,
         "Entries with less than {} references will be filtered.",
         min_references
-    );
-    print!("Evaluating parsed companies...");
+    )
+    .unwrap();
+    write!(stdout, "Evaluating parsed companies...").unwrap();
+    stdout.flush().unwrap();
     let candidates = eval_candidates(data, min_references, avg);
-    println!(" Done!");
-    println!("Number of entries after filtering: {}", candidates.len());
+    write!(stdout, " Done!").unwrap();
+    write!(
+        stdout,
+        "Number of entries after filtering: {}",
+        candidates.len()
+    )
+    .unwrap();
     std::io::stdout().flush().unwrap();
 
     data_file_output(candidates);
