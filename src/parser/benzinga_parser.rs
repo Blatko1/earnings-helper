@@ -19,7 +19,8 @@ const PREVIOUS_MONTH_BUTTON_SELECTOR: &str =
     "span[class=\"DayPicker-NavButton DayPicker-NavButton--prev\"]";
 const DATE_PICKER_SELECTOR: &str =
     "div[class=\"range-date-picker__field-wrapper\"]";
-const SYMBOL_SELECTOR: &str = "tr[class=\"ant-table-row ant-table-row-level-0\"]>td:nth-child(3)>div>div>div>a";
+const SYMBOL_SELECTOR: &str =
+    "tr[class=\"ant-table-row ant-table-row-level-0\"]>td:nth-child(3)>div>div>div>a";
 
 pub struct BenzingaParser {}
 

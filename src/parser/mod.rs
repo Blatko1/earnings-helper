@@ -35,7 +35,9 @@ const MAX_RERUNS: usize = 1;
 
 /// Returns all parsed data in one `Vec` with an average of entries
 /// per parsed website.
-pub async fn parse_website_data() -> anyhow::Result<(Vec<Company>, usize)> {
+pub async fn parse_website_data(
+    day: RelativeDay,
+) -> anyhow::Result<(Vec<Company>, usize)> {
     let mut stdout = std::io::stdout().lock();
     write!(stdout, "Initializing WebDriver...")?;
     stdout.flush()?;
@@ -47,8 +49,6 @@ pub async fn parse_website_data() -> anyhow::Result<(Vec<Company>, usize)> {
         .map_err(|e| writeln!(stdout, "Is chromedriver started? Error: {e}"))
         .unwrap();
     writeln!(stdout, "Success!")?;
-
-    let day = RelativeDay::Tomorrow;
 
     let web_parsers = vec![
         Parser::Marketwatch,
@@ -64,8 +64,8 @@ pub async fn parse_website_data() -> anyhow::Result<(Vec<Company>, usize)> {
     let parsed_websites = parsed.len();
     // Store all data into one big array.
     let data: Vec<Company> = parsed.into_iter().flatten().collect();
-    let avg = parsed_websites / data.len();
-    Ok((data, avg))
+
+    Ok((data, parsed_websites))
 }
 
 async fn parse_all(
@@ -80,18 +80,19 @@ async fn parse_all(
         write!(stdout, "Reading '{}' data...", parser.get_name())?;
         let mut max_reruns = MAX_RERUNS;
 
-        let parsed = loop {
+        loop {
             stdout.flush()?;
 
             match parser.parse(driver, day).await {
-                Ok(c) => {
+                Ok(parsed) => {
                     writeln!(stdout, " Success!")?;
-                    break c;
+                    result.push(parsed);
+                    break;
                 }
                 Err(e) => {
                     if max_reruns == 0 {
                         writeln!(stdout, "\nCouldn't parse data: {e}")?;
-                        break vec![];
+                        break;
                     }
                     writeln!(stdout, "Failed to parse data: {e}")?;
                     write!(stdout, "Trying again...")?;
@@ -99,9 +100,7 @@ async fn parse_all(
                     continue;
                 }
             }
-        };
-
-        result.push(parsed);
+        }
     }
     Ok(result)
 }

@@ -1,10 +1,46 @@
-Refs.		Symbol		Company Name
-5		QBTS		D-Wave Quantum Inc.
-5		GTEC		Greenland Technologies Holding Corp.
-5		CTLT		Catalent Inc.
-5		RBC		RBC Bearings
-4		MSADY		MS&amp;AD Insurance Group Holdings PK
-4		CINT		CI&amp;T Inc.
-5		FL		Foot Locker
-5		DE		Deere &amp; Co.
-4		TKOMY		Tokio Marine Holdings Inc. ADR
+Refs.	Symbol 	Company Name
+    4	OCFT   	OneConnect Financial Technology Co. Ltd. ADR
+    4	YMM    	Full Truck Alliance Co. Ltd. ADR
+    5	ZIM    	ZIM Integrated Shipping Services Ltd.
+    3	KBNT   	Kubient
+    3	XCUR   	Exicure
+    3	TBLT   	Toughbuilt Industries
+    3	LTRY   	Lottery.com
+    3	TKAT   	Takung Art
+    3	AULT   	Ault Alliance
+    3	RVYL   	Ryvyl
+    3	HTCR   	HeartCore Enterprises
+    3	DERM   	Journey Medical
+    3	LGIQ   	Logiq
+    3	EVTV   	Envirotech Vehicles
+    3	GROW   	US Global
+    3	SBEV   	Splash Beverage Group
+    3	POL    	PolishedCom
+    3	ALJJ   	ALJ Regional
+    3	FXLV   	F45 Training Holdings
+    3	CELU   	Celularity
+    3	SY     	So-Young
+    3	NIU    	Niu Tech
+    4	CSWC   	Capital Southwest
+    4	TRNS   	Transcat
+    4	NVGS   	Navigator Holdings
+    4	LU     	Lufax
+    4	GLBE   	GlobalE Online
+    3	BKHYY  	Bank Hapoalim ADR
+    5	NDSN   	Nordson
+    3	RYAAY  	Ryanair ADR
+    5	ZM     	Zoom Video
+    3	ARDS   	ARIDIS PHARMACEUTICALS INC.
+    3	AUVI   	APPLIED UV, INC.
+    3	VVOS   	VIVOS THERAPEUTICS, INC.
+    3	MARK   	REMARK HOLDINGS, INC.
+    3	ELYS   	Elys Game Technology
+    4	BMTX   	Bm Technologies
+    3	WEJO   	Wejo
+    3	ICCM   	Icecure Medical
+    4	PETS   	PetMed Express
+    3	NAT    	Nordic American Tankers
+    3	NNOX   	Nano X
+    5	HEI    	HEICO CORPORATION
+    3	OTLC   	Oncotelic Therapeutics
+    3	UAMY   	UNITED STATES ANTIMONY CORPORATION
