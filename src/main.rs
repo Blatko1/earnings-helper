@@ -126,7 +126,7 @@ fn data_file_output(data: Vec<CompanyCandidate>) -> anyhow::Result<()> {
     std::fs::write(OUTPUT_FILE_NAME, output).unwrap();
     println!(
         "Parsed data saved at:\n\t'{}'",
-        std::fs::canonicalize(OUTPUT_FILE_NAME)?.to_str().unwrap()
+        std::fs::canonicalize(OUTPUT_FILE_NAME)?.display()
     );
     Ok(())
 }
