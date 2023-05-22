@@ -33,12 +33,15 @@ async fn main() {
         write!(stdout, "TODAY").unwrap();
         RelativeDay::Today
     };
+    let window_visibility = matches.get_flag("preview");
 
     let min_references = *matches.get_one::<u8>("refs").unwrap() as usize;
     write!(stdout, "\nMinimum references: {min_references}\n").unwrap();
 
     let (data, parsed_websites) =
-        parser::parse_website_data(day).await.unwrap();
+        parser::parse_website_data(day, window_visibility)
+            .await
+            .unwrap();
     let avg = parsed_websites / data.len();
     write!(
         stdout,

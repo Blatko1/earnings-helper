@@ -16,7 +16,16 @@ pub fn cmd() -> Command {
                 )
                 .required(true)
                 .value_parser(clap::value_parser!(u8).range(..=5)),
-            //.default_value(val), default value is calculated later
+        )
+        .arg(
+            Arg::new("preview")
+                .short('p')
+                .alias("view")
+                .help(
+                    "If present, the headless chrome will be visible \
+                    to user while it's navigating and parsing data.",
+                )
+                .action(ArgAction::SetTrue),
         )
         .arg(
             Arg::new("tdy")

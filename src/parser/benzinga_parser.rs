@@ -15,6 +15,8 @@ const POPUP_CLOSE_BUTTON1_SELECTOR: &str =
     "button[class=\"StyledIconButtonElement-sc-114x20d-0 jdccT prosper-field-button\"";
 const POPUP_CLOSE_BUTTON2_SELECTOR: &str =
     "armington-ButtonElement--KAlieQqWWrwt2Isu6MDd";
+const POPUP_CLOSE_BUTTON3_SELECTOR: &str =
+    "hedrick-ButtonElement--i1vL3d8rL0altqhu34kO";
 const PREVIOUS_MONTH_BUTTON_SELECTOR: &str =
     "span[class=\"DayPicker-NavButton DayPicker-NavButton--prev\"]";
 const DATE_PICKER_SELECTOR: &str =
@@ -103,6 +105,7 @@ async fn close_popup(driver: &WebDriver) -> anyhow::Result<()> {
     let button = driver
         .query(By::Css(POPUP_CLOSE_BUTTON1_SELECTOR))
         .or(By::Id(POPUP_CLOSE_BUTTON2_SELECTOR))
+        .or(By::Id(POPUP_CLOSE_BUTTON3_SELECTOR))
         .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
         .desc("Find popup close button")
         .single()

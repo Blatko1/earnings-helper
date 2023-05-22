@@ -37,13 +37,16 @@ const MAX_RERUNS: usize = 1;
 /// per parsed website.
 pub async fn parse_website_data(
     day: RelativeDay,
+    window_is_visible: bool,
 ) -> anyhow::Result<(Vec<Company>, usize)> {
     let mut stdout = std::io::stdout().lock();
     write!(stdout, "Initializing WebDriver...")?;
     stdout.flush()?;
 
     let mut caps = DesiredCapabilities::chrome();
-    caps.set_headless()?;
+    if !window_is_visible {
+        caps.set_headless()?;
+    }
     let driver = WebDriver::new("http://localhost:9515", caps)
         .await
         .map_err(|e| writeln!(stdout, "Is chromedriver started? Error: {e}"))

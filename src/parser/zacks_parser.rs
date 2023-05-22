@@ -98,9 +98,6 @@ async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
     Ok(())
 }
 
-// TODO add By:Css or By::Id to consts
-// TODO put TIMEOUT const and WAIT INTERVAL and other const in mod.rs
-
 // TODO branch this function into smaller functions.
 async fn parse_data(
     driver: &WebDriver,

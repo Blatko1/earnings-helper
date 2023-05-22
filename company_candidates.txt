@@ -1,169 +1,42 @@
 Refs.	Symbol 	Company Name
-    3	RYAAY  	Ryanair Holdings PLC ADR
-    2	TREVQ  	Trevali Mining Corp
-    2	FNHCQ  	Fednat Holding Co
-    2	ALNAQ  	Allena Pharma
-    2	CYRNQ  	Cyren
-    2	MSLPQ  	Musclepharm Corp
-    2	HYREQ  	HyreCar
-    2	TGHI   	Touchpoint Group Holdings Inc
-    2	GAHC   	Global Arena
-    2	ABMC   	Amer Bio Medica
-    2	AFHIF  	Atlas Financials
-    2	RSPI   	RespireRx Pharma
-    2	PEARQ  	Pear Therapeutics
-    2	ANDR   	Andrea Electronic Cp
-    2	USRM   	US Stem Cell
-    2	PTE    	Polarityte
-    2	FWBI   	First Wave BioPharma
-    2	CBNT   	C-Bond Systems
-    2	INLB   	Item 9 Labs
-    2	MACE   	Mace Security Intl
-    2	PRTYQ  	Party City Holdco Inc
-    2	MICR   	Micron Solutions
-    3	KBNT   	Kubient
-    2	ONCR   	Oncorus
-    3	XCUR   	Exicure
-    2	CSTI   	Costar Tech Inc
-    2	SBNY   	Signature Bank
-    2	QTEK   	QualTek Services
-    2	MRCR   	Moro
-    2	CCUR   	CCUR Holdings
-    2	SRAX   	SRAX
-    2	ATTO   	Atento SA
-    2	OCLN   	OriginClear
-    2	CLRD   	Clearday
-    3	TBLT   	Toughbuilt Industries
-    2	LMPX   	Lmp Auto
-    2	SIF    	SIFCO
-    2	ID     	PARTS iD
-    3	LTRY   	Lottery.com
-    2	IHT    	InnSuites Hospitality
-    2	DYSL   	Dynasil of America
-    3	TKAT   	Takung Art
-    2	ORBT   	Orbit
-    3	RVYL   	Ryvyl
-    3	HTCR   	HeartCore Enterprises
-    2	AMPG   	Amplitech
-    2	DERM   	Journey Medical
-    2	ICCT   	Icoreconnect
-    2	FBPI   	First Bancorp Indiana
-    2	SOWG   	Black Ridge Oil Gas
-    2	DTSS   	Datasea
-    3	LGIQ   	Logiq
-    2	PLUR   	Pluri Inc
-    2	TUP    	Tupperware Brands
-    4	BMTX   	Bm Technologies
-    2	IDEX   	Ideanomics
-    3	EVTV   	Envirotech Vehicles
-    3	UAMY   	United States Antimony
-    2	NM     	Navios Maritime Holdings
-    2	MGTA   	Magenta Therapeutics
-    2	IMUC   	ImmunoCellular
-    3	GROW   	US Global
-    2	AAME   	Atlantic American
-    2	LVTX   	LAVA Therapeutics NV
-    3	SBEV   	Splash Beverage Group
-    2	QEPC   	QEP
-    2	YQ     	17 Education Tech
-    2	CHKR   	Chesapeake Granite Wash Trust
-    2	PXHI   	Phonex
-    2	VIAO   	Via Optronics
-    2	RIDE   	Lordstown Motors
-    3	POL    	PolishedCom
-    3	ALJJ   	ALJ Regional
-    2	TESS   	TESSCO
-    2	INTG   	The Intergroup
-    3	FXLV   	F45 Training Holdings
-    2	ARCW   	ARC Group
-    2	FONR   	Fonar
-    3	CELU   	Celularity
-    2	OIBZQ  	Oi ADR
-    2	GLSI   	Greenwich Life
-    2	PNRG   	PrimeEnergy
-    2	BTBT   	Bit Digital
-    2	BARK   	BARK
-    3	SY     	So-Young
-    2	NESR   	National Energy Services
-    2	PLCE   	Children’s Place
-    2	QD     	Qudian Inc
-    2	UONE   	Urban One Inc
-    3	NIU    	Niu Tech
-    2	AROW   	Arrow
-    2	TSP    	Tusimple Holdings
-    2	SST    	System1
-    2	SUPV   	Grupo Supervielle
-    2	MITK   	Mitek
-    2	LICT   	Lict Corporation
-    2	NNDM   	Nano Dimension
-    4	CSWC   	Capital Southwest
-    4	TRNS   	Transcat
-    3	NAT    	Nordic American Tankers
-    4	NVGS   	Navigator Holdings
-    3	NNOX   	Nano X
-    2	MDRX   	Veradigm
-    4	ZIM    	ZIM Integrated Shipping Services
-    4	LU     	Lufax
-    4	GLBE   	GlobalE Online
-    3	BKHYY  	Bank Hapoalim ADR
-    4	NDSN   	Nordson
-    4	ZM     	Zoom Video
-    2	GMBL   	ESPORTS ENTERTAINMENT GROUP INC.
-    3	ARDS   	ARIDIS PHARMACEUTICALS INC.
-    2	CBIO   	Catalyst Biosciences
-    3	AUVI   	APPLIED UV, INC.
-    2	GLMD   	GALMED PHARMACEUTICALS LTD.
-    3	VVOS   	VIVOS THERAPEUTICS, INC.
-    2	ONVC   	ONLINE VACATION CENTER HOLDINGS COR
-    2	TC     	TUANCHE LIMITED
-    2	VBLT   	Vascular Biogenics
-    3	OTLC   	ONCOTELIC THERAPEUTICS, INC.
-    2	MARK   	REMARK HOLDINGS, INC.
-    2	GRI    	GRI BIO, INC.
-    2	GNS    	GENIUS GROUP LIMITED
-    3	AULT   	Ault Alliance
-    3	ELYS   	ELYS GAME TECHNOLOGY, CORP.
-    2	ALRTF  	ALR TECHNOLOGIES SG LTD.
-    2	DSHK   	Drive Shack
-    2	VORBQ  	Virgin Orbit Holdings
-    2	CRVW   	Careview Comm Inc
-    2	DSS    	DSS
-    2	ESOA   	ENERGY SERVICES OF AMERICA CORPORATION
-    2	MEEC   	Midwest Energy Emiss
-    2	ROYTL  	Pacific Coast Oil Trust
-    3	WEJO   	WEJO GROUP LIMITED
-    2	EVAX   	EVAXION BIOTECH A/S
-    2	ODTC   	Odonate Therapeutics
-    2	RRTS   	Roadrunner
-    3	ICCM   	Icecure Medical
-    2	JFBC   	Jeffersonville Bancorp
-    2	AMBK   	AMERICAN BANK, INC.
-    2	EGIO   	Edgio
-    2	HYZN   	HYZON MOTORS INC.
-    3	OCFT   	ONECONNECT FINANCIAL TECHNOLOGY CO., LTD.
-    2	YI     	111 Inc
-    4	PETS   	PetMed Express
-    2	PROC   	Procaps
-    2	TIGR   	UP FINTECH HOLDING LIMITED
-    2	GOTU   	Gaotu Techedu DRC
-    2	NMM    	NAVIOS MARITIME PARTNERS LP
-    2	WALD   	WALDENCAST PLC
-    2	NOAH   	NOAH HOLDINGS LIMITED
-    2	TUYA   	TUYA INC.
-    2	NAAS   	NAAS TECHNOLOGY INC.
-    2	FRHC   	FREEDOM HOLDING CORP.
-    2	CTLT   	CATALENT, INC.
-    4	HEI    	HEICO CORPORATION
-    2	TURN   	Harris &amp; Harris Group
-    2	ATRX   	Adhera Therapeutics
-    2	TKOI   	Telkonet Inc
-    2	RNAZ   	Transcode Therapeutics
-    2	FUV    	ARCIMOTO, INC.
-    2	REED   	REEDS, INC.
-    2	NSTM   	Hollywood Media Co
-    2	TAIT   	Taitron Components
-    2	TRIB   	TRINITY BIOTECH PLC
-    2	GNUS   	GENIUS BRANDS INTERNATIONAL, INC.
-    2	MYMD   	MyMD Pharmaceuticals
-    3	YMM    	Full Truck Alliance
-    2	HEI.A  	Heico
+    5	A      	Agilent Technologies Inc.
+    5	PANW   	Palo Alto Networks Inc.
+    5	VIPS   	Vipshop Holdings Ltd. ADR
+    3	AMNI   	American Noble
+    4	ZEPP   	Zepp Health
+    2	SOTK   	Sono-Tek Corp
+    3	LX     	Lexinfintech
+    3	ARCE   	Arco Platform&nbsp;
+    2	PTNRY  	Partner ADR
+    3	CAAP   	Corporacion America Airports
+    2	CBRL   	Cracker Barrel Old
+    3	SDRL   	Seadrill Ltd
+    4	NEWR   	New Relic Inc
+    2	BILI   	Bilibili
+    5	DKS    	Dick’s Sporting Goods
+    4	AZO    	AutoZone
+    2	ZTNO   	ZOOM TECHNOLOGIES INC.
+    4	NLS    	NAUTILUS, INC.
+    4	OOMA   	Ooma Inc
+    4	ECC    	Eagle Point Cred
+    4	TARO   	Taro Pharma Industries
+    4	IHS    	IHS Holding
+    4	DAVA   	ENDAVA PLC
+    5	VFC    	V.F. CORPORATION
+    5	INTU   	Intuit
+    4	AFMD   	AFFIMED N.V.
+    2	CNET   	ZW Data Action Technologies
+    4	CTRN   	CITI TRENDS, INC.
+    4	REE    	REE Automotive
+    2	RERE   	ATRENEW INC.
+    3	CLCO   	Cool Company Ltd.
+    4	KC     	Kingsoft Cloud
+    2	HSAI   	Hesai Group Sponsored ADR
+    3	BBAR   	BBVA Banco Frances
+    5	BJ     	BJ'S WHOLESALE CLUB HOLDINGS, INC.
+    5	LOW    	LOWE'S COMPANIES, INC.
+    5	TOL    	Toll Brothers
+    4	URBN   	URBAN OUTFITTERS, INC.
+    5	WSM    	WilliamsSonoma
+    2	IDBA   	Idex Biometrics ASA
+    2	IPIC   	Ipic Entertainment

@@ -18,6 +18,11 @@ const NEXT_DAY_SELECTOR: &str = "li[class=\"tab__item next day\"]";
 const COOKIES_AGREE_BUTTON_SELECTOR: &str = "button[class=\"message-component message-button no-children focusable agree-btn sp_choice_type_11\"]";
 const COOKIE_MESSAGE_IFRAME: &str = "sp_message_iframe_719544";
 
+// Weird website logic bug when today is monday and the 'previous day'
+// button is pressed. It move the calendar back 2 weeks instead of 1.
+// Will not be fixed because Sunday's usually don't have scheduled
+// earnings releases.
+
 pub struct MarketWatchParser {}
 
 #[async_trait]
