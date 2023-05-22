@@ -64,7 +64,10 @@ async fn main() {
     .unwrap();
     write!(stdout, "\nEvaluating parsed companies...").unwrap();
     stdout.flush().unwrap();
-    let candidates = eval_candidates(data, min_references, avg);
+    let mut candidates = eval_candidates(data, min_references, avg);
+    candidates.sort_by(|a, b| {
+        a.refs.cmp(&b.refs).reverse()
+    });
     write!(stdout, " Done!").unwrap();
     write!(
         stdout,
