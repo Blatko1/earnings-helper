@@ -14,4 +14,4 @@ $ earnings-helper --help
 
 for usage info.
 
-> Running in `preview` mode sometimes doesn't work!
+> Running the parser in `preview` mode will sometimes fail!
