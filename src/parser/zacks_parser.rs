@@ -18,7 +18,7 @@ const SYMBOL_SELECTOR: &str =
 const COMPANY_NAME_SELECTOR: &str =
     "table#earnings_rel_data_all_table>tbody>tr>td:nth-child(2)>span";
 const SHOW_ALL_BUTTON_SELECTOR: &str = "option[value=\"-1\"]";
-const COOKIE_ACCEPT_ID: &str = "accept_cookie";
+const COOKIE_ACCEPT_CSS: &str = "button[class=\"Button__StyledButton-a1qza5-0 fLZgds\"]";
 const EVENTS_TITLE: &str = "WeeklyEventsTitle";
 
 pub struct ZacksParser {}
@@ -88,7 +88,7 @@ async fn to_next_week(driver: &WebDriver) -> anyhow::Result<()> {
 
 async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
     driver
-        .query(By::Id(COOKIE_ACCEPT_ID))
+        .query(By::Css(COOKIE_ACCEPT_CSS))
         .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
         .desc("Find the 'Accept cookies' button")
         .single()

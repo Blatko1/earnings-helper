@@ -45,7 +45,7 @@ async fn main() {
     let avg = parsed_websites / data.len();
     write!(
         stdout,
-        "\nSuccessfully parsed websites: {}",
+        "\nSuccessfully parsed websites: {} out of 5",
         parsed_websites
     )
     .unwrap();
