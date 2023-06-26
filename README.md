@@ -6,6 +6,8 @@ CLI Program that helps you track upcoming company earnings using web scraping th
 
 First build the source code by adding the `--release` flag and then find the *runnable* file in the `target` folder.
 
+Before running the program download [chromedriver](https://chromedriver.chromium.org/downloads) and start it in another terminal. Most of the time you will need the most recent available version.
+
 Run:
 
 ```console
