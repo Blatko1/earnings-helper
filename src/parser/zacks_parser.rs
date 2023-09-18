@@ -18,7 +18,8 @@ const SYMBOL_SELECTOR: &str =
 const COMPANY_NAME_SELECTOR: &str =
     "table#earnings_rel_data_all_table>tbody>tr>td:nth-child(2)>span";
 const SHOW_ALL_BUTTON_SELECTOR: &str = "option[value=\"-1\"]";
-const COOKIE_ACCEPT_CSS: &str = "button[class=\"Button__StyledButton-a1qza5-0 fLZgds\"]";
+const COOKIE_ACCEPT_CSS: &str =
+    "button[class=\"Button__StyledButton-a1qza5-0 fLZgds\"]";
 const EVENTS_TITLE: &str = "WeeklyEventsTitle";
 
 pub struct ZacksParser {}
