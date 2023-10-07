@@ -1,3 +1,4 @@
 /target
 /chromedriver
 company_candidates.txt
+Cargo.lock
