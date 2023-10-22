@@ -22,6 +22,7 @@ const ACCEPT_BUTTON_CSS: &str =
     "button[class=\"Button__StyledButton-a1qza5-0 fLZgds\"]";
 const COOKIE_ACCEPT_CSS: &str = "button[id=\"accept_cookie\"";
 const EVENTS_TITLE: &str = "WeeklyEventsTitle";
+const READ_MODE_BUTTON_CSS: &str = "button[class=\"Button__StyledButton-a1qza5-0 fLZgds\"]";
 
 pub struct ZacksParser {}
 
@@ -89,6 +90,13 @@ async fn to_next_week(driver: &WebDriver) -> anyhow::Result<()> {
 }
 
 async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
+    if let Ok(button) = driver.query(By::Css(READ_MODE_BUTTON_CSS))
+    .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
+    .desc("Find the 'Read more' button")
+    .single()
+        .await {
+            button.click().await?;
+        }
     driver
         .query(By::Css(ACCEPT_BUTTON_CSS))
         .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
