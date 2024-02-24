@@ -2,6 +2,7 @@ mod commands;
 mod parser;
 
 use crate::parser::RelativeDay;
+use chrono::{DateTime, Days, Local};
 use parser::Company;
 use std::io::Write;
 
@@ -20,17 +21,17 @@ async fn main() {
 
     write!(stdout, "Data parsing in progress for: ").unwrap();
 
-    let day = if matches.get_flag("tdy") {
-        write!(stdout, "TODAY").unwrap();
-        RelativeDay::Today
-    } else if matches.get_flag("tmr") {
-        write!(stdout, "TOMORROW").unwrap();
+    let date = Local::now();
+    let day = if matches.get_flag("tmr") {
+        let tomorrow_date = date.checked_add_days(Days::new(1)).unwrap().date_naive();
+        write!(stdout, "TOMORROW ({})", tomorrow_date).unwrap();
         RelativeDay::Tomorrow
     } else if matches.get_flag("yda") {
-        write!(stdout, "YESTERDAY").unwrap();
+        let yesterday_date = date.checked_sub_days(Days::new(1)).unwrap().date_naive();
+        write!(stdout, "YESTERDAY ({})", yesterday_date).unwrap();
         RelativeDay::Yesterday
     } else {
-        write!(stdout, "TODAY").unwrap();
+        write!(stdout, "TODAY ({})", date.date_naive()).unwrap();
         RelativeDay::Today
     };
     let window_visibility = matches.get_flag("preview");
@@ -42,13 +43,22 @@ async fn main() {
         parser::parse_website_data(day, window_visibility)
             .await
             .unwrap();
-    let avg = parsed_websites / data.len();
+
     write!(
         stdout,
         "\nSuccessfully parsed websites: {} out of 5",
         parsed_websites
     )
     .unwrap();
+    if data.is_empty() {
+        write!(
+            stdout,
+            "\nTotal number of entries: 0",
+        )
+        .unwrap();
+        std::process::exit(0);
+    };
+    let avg = parsed_websites / data.len();
     write!(
         stdout,
         "\nTotal number of entries (no filter): {}",
