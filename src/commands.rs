@@ -12,7 +12,7 @@ pub fn cmd() -> Command {
             Arg::new("refs")
                 .help(
                     "Set the minimum amount of references \
-                    needed for each company.",
+                    needed for each company (in range 1-5).",
                 )
                 .required(true)
                 .value_parser(clap::value_parser!(u8).range(..=5)),

@@ -8,7 +8,7 @@ use async_trait::async_trait;
 use std::{io::Write, time::Duration};
 
 use chrono::{Days, NaiveDate};
-use thirtyfour::{DesiredCapabilities, WebDriver};
+use thirtyfour::{ChromiumLikeCapabilities, DesiredCapabilities, WebDriver};
 
 use self::{
     benzinga_parser::BenzingaParser, investing_parser::InvestingParser,
@@ -88,7 +88,7 @@ async fn parse_all(
 
             match parser.parse(driver, day).await {
                 Ok(parsed) => {
-                    writeln!(stdout, " Success!")?;
+                    writeln!(stdout, " Success! Parsed entries: {}", parsed.len())?;
                     result.push(parsed);
                     break;
                 }

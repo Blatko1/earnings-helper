@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use async_trait::async_trait;
 use chrono::{Datelike, NaiveDate, Weekday};
 use thirtyfour::{prelude::ElementQueryable, By, WebDriver};
@@ -17,6 +19,7 @@ const PREVIOUS_DAY_SELECTOR: &str = "li[class=\"tab__item prev day\"]";
 const NEXT_DAY_SELECTOR: &str = "li[class=\"tab__item next day\"]";
 const COOKIES_AGREE_BUTTON_SELECTOR: &str = "button[class=\"message-component message-button no-children focusable agree-btn sp_choice_type_11\"]";
 const COOKIE_MESSAGE_IFRAME: &str = "sp_message_iframe_719544";
+const COOKIE_MESSAGE_IFRAME_SELECTOR: &str = "iframe[title=\"SP Consent Message\"]";
 
 // Weird website logic bug when today is monday and the 'previous day'
 // button is pressed. It move the calendar back 2 weeks instead of 1.
@@ -39,7 +42,8 @@ impl WebsiteParser for MarketWatchParser {
         accept_cookies(driver)
             .await
             .or(driver.enter_default_frame().await)?;
-
+        
+        driver.screenshot(Path::new("./screen.png")).await.unwrap();
         let today = chrono::offset::Local::now().date_naive();
         let target = day.get_date();
         let target_weekday = target.weekday();
@@ -105,7 +109,7 @@ async fn to_next_week(driver: &WebDriver) -> anyhow::Result<()> {
 /// interact with the elements behind the cookies iframe.
 async fn accept_cookies(driver: &WebDriver) -> anyhow::Result<()> {
     let iframe = driver
-        .query(By::Id(COOKIE_MESSAGE_IFRAME))
+        .query(By::Css(COOKIE_MESSAGE_IFRAME_SELECTOR))
         .wait(TIMEOUT_FIVE_SEC, WAIT_INTERVAL)
         .desc("Wait for cookies dialog box to appear")
         .single()
@@ -127,6 +131,8 @@ async fn parse_data(
 ) -> anyhow::Result<Vec<Company>> {
     let date_selector =
         &format!("div.element[data-tab-pane=\"{}\"]", date.format("%m/%d/%Y"));
+        let source = driver.source().await?;
+    std::fs::write("./source.html", &source)?;
     driver
         .query(By::Css(date_selector))
         .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
@@ -134,6 +140,7 @@ async fn parse_data(
         .single()
         .await?;
     let source = driver.source().await?;
+    std::fs::write("./source.html", &source)?;
     let document = scraper::Html::parse_document(&source);
 
     let css_symbol_selector = &format!("{}>{}", date_selector, SYMBOL_SELECTOR);

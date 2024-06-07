@@ -2,7 +2,7 @@ mod commands;
 mod parser;
 
 use crate::parser::RelativeDay;
-use chrono::{DateTime, Days, Local};
+use chrono::{Days, Local};
 use parser::Company;
 use std::io::Write;
 
