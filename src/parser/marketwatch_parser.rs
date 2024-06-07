@@ -43,7 +43,6 @@ impl WebsiteParser for MarketWatchParser {
             .await
             .or(driver.enter_default_frame().await)?;
         
-        driver.screenshot(Path::new("./screen.png")).await.unwrap();
         let today = chrono::offset::Local::now().date_naive();
         let target = day.get_date();
         let target_weekday = target.weekday();
@@ -131,8 +130,6 @@ async fn parse_data(
 ) -> anyhow::Result<Vec<Company>> {
     let date_selector =
         &format!("div.element[data-tab-pane=\"{}\"]", date.format("%m/%d/%Y"));
-        let source = driver.source().await?;
-    std::fs::write("./source.html", &source)?;
     driver
         .query(By::Css(date_selector))
         .wait(TIMEOUT_TEN_SEC, WAIT_INTERVAL)
