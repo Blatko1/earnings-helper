@@ -6,10 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-scraper = "0.19.0"
-anyhow = "1.0.75"
-chrono = "0.4.31"
-tokio = { version = "1.32.0", features = ["full"] }
-thirtyfour = "0.32.0"
-async-trait = "0.1.73"
+scraper = "0.19.1"
+anyhow = "1.0.86"
+chrono = "0.4.38"
+tokio = { version = "1.39.2", features = ["full"] }
+thirtyfour = "0.33.0"
+async-trait = "0.1.81"
 clap = "4.4.6"
